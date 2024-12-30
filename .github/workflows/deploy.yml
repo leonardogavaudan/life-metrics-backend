@@ -1,0 +1,82 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Build and Test
+        run: |
+          go mod download
+          go build -v ./...
+          go test -v ./...
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: life-metrics-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: life-metrics-backend
+          IMAGE_TAG: ${{ github.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,GITHUB_REPOSITORY
+          script: |
+            # Download deployment script
+            curl -o deploy.sh https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/deploy.sh
+            chmod +x deploy.sh
+
+            # Configure AWS credentials on VPS
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set region ${{ secrets.AWS_REGION }}
+
+            # Login to ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+            # Run deployment script
+            ECR_REGISTRY=$ECR_REGISTRY \
+            ECR_REPOSITORY=$ECR_REPOSITORY \
+            IMAGE_TAG=$IMAGE_TAG \
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+            VPS_USERNAME=${{ secrets.VPS_USERNAME }} \
+            GITHUB_REPOSITORY=${{ github.repository }} \
+            ./deploy.sh
