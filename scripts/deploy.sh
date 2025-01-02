@@ -20,6 +20,7 @@ set -e
 : "${VPS_USERNAME:?Need to set VPS_USERNAME}"
 
 # Ensure Docker and Docker Compose are installed
+echo "Installing Docker and Docker Compose..."
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose
 
@@ -45,12 +46,15 @@ curl -o docker-compose.yml https://raw.githubusercontent.com/${GITHUB_REPOSITORY
 curl -o docker-compose.prod.yml https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/docker-compose.prod.yml
 
 # Stop and remove existing containers (but keep volumes)
-docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+echo "Stopping existing containers..."
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml down || true
 
 # Pull latest images
-docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+echo "Pulling latest images..."
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
 
 # Start services
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+echo "Starting services..."
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 echo "Deployment completed successfully!"
