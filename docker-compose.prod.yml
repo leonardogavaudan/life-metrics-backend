@@ -1,3 +1,4 @@
 services:
   api:
     image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+# test
