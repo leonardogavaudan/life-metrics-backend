@@ -1,15 +1,13 @@
-FROM golang:1.21-alpine
+FROM oven/bun:1
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY package.json bun.lockb ./
 
-RUN go mod download
+RUN bun install
 
 COPY . .
 
-RUN go build -o main .
+EXPOSE 3000
 
-EXPOSE 8080
-
-CMD ["./main"]
+CMD ["bun", "run", "start"]
