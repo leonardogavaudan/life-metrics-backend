@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { OAuth2Client } from 'google-auth-library';
 
-const authRouter = new Hono()
+export const authRouter = new Hono()
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
