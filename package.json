@@ -1,11 +1,9 @@
 {
   "name": "life-metrics-backend",
-  {
-    "scripts": {
-      "dev": "bun run --hot src/index.ts",
-      "start": "bun run src/index.ts"
-    },
-  }
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun run --hot src/index.ts",
+  },
   "dependencies": {
     "google-auth-library": "^9.15.0",
     "hono": "^4.6.16"
