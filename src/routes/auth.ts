@@ -14,7 +14,7 @@ authRouter.get('/', (c) => {
     scope: ['email', 'profile'],
   });
 
-  return c.redirect(authorizeUrl)
+  return c.json({ url: authorizeUrl })
 })
 
 authRouter.post('/callback', async (c) => {
