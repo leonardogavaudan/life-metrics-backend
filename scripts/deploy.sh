@@ -9,6 +9,8 @@ set -e
 # - POSTGRES_PASSWORD
 # - POSTGRES_DB
 # - VPS_USERNAME
+# - GOOGLE_CLIENT_ID
+# - GOOGLE_CLIENT_SECRET
 
 # Ensure all required variables are set
 : "${ECR_REGISTRY:?Need to set ECR_REGISTRY}"
@@ -18,6 +20,8 @@ set -e
 : "${POSTGRES_PASSWORD:?Need to set POSTGRES_PASSWORD}"
 : "${POSTGRES_DB:?Need to set POSTGRES_DB}"
 : "${VPS_USERNAME:?Need to set VPS_USERNAME}"
+: "${GOOGLE_CLIENT_ID:?Need to set GOOGLE_CLIENT_ID}"
+: "${GOOGLE_CLIENT_SECRET:?Need to set GOOGLE_CLIENT_SECRET}"
 
 # Ensure Docker and Docker Compose are installed
 echo "Installing Docker and Docker Compose..."
@@ -39,6 +43,8 @@ POSTGRES_DB=${POSTGRES_DB}
 ECR_REGISTRY=${ECR_REGISTRY}
 ECR_REPOSITORY=${ECR_REPOSITORY}
 IMAGE_TAG=${IMAGE_TAG}
+GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 EOL
 
 # Download docker-compose files

@@ -111,5 +111,7 @@ jobs:
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
             VPS_USERNAME=${{ secrets.VPS_USERNAME }} \
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
             GITHUB_REPOSITORY=${{ github.repository }} \
             ./deploy.sh
