@@ -5,10 +5,10 @@ export const authRouter = new Hono()
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.REDIRECT_URI
+  "https://app.lifemetrics.io/login"
 );
 
-authRouter.get('/', (c) => {
+authRouter.get('/google', (c) => {
   const authorizeUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['email', 'profile'],
@@ -17,7 +17,7 @@ authRouter.get('/', (c) => {
   return c.json({ url: authorizeUrl })
 })
 
-authRouter.post('/callback', async (c) => {
+authRouter.post('/google/callback', async (c) => {
   const { code } = await c.req.json()
 
   try {
