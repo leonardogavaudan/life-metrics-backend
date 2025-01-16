@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Load environment variables from .env file
 set -a
 source ~/life-metrics-backend/.env
