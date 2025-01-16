@@ -95,13 +95,20 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 # Wait for PostgreSQL to be ready
 echo "Waiting for PostgreSQL to be ready..."
-for i in {1..30}; do
-    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db pg_isready -U ${POSTGRES_USER} > /dev/null 2>&1; then
+RETRIES=30
+RETRY_INTERVAL=5
+
+for i in $(seq 1 $RETRIES); do
+    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps postgres | grep -q "healthy"; then
         echo "PostgreSQL is ready!"
         break
     fi
-    echo "Waiting for PostgreSQL... (attempt $i/30)"
-    sleep 2
+    if [ "$i" -eq "$RETRIES" ]; then
+        echo "❌ PostgreSQL failed to become ready after $RETRIES attempts"
+        exit 1
+    fi
+    echo "Waiting for PostgreSQL to be healthy... (attempt $i/$RETRIES)"
+    sleep $RETRY_INTERVAL
 done
 
 # Run database migrations
