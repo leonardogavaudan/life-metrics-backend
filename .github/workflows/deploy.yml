@@ -28,10 +28,11 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
           source: "scripts/deploy.sh"
           target: "~/"
           strip_components: 1
-          timeout: 60s
+          debug: true
 
       - name: Execute deployment script
         uses: appleboy/ssh-action@master
@@ -39,6 +40,8 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          debug: true
           envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,VPS_USERNAME,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,JWT_SECRET,GITHUB_REPOSITORY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION
           script: |
             chmod +x ~/deploy.sh
