@@ -36,11 +36,11 @@ echo "Installing required packages..."
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose unzip curl
 
-# Install AWS CLI
-echo "Installing AWS CLI..."
+# Install/Update AWS CLI
+echo "Installing/Updating AWS CLI..."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
-sudo ./aws/install
+sudo ./aws/install --update
 
 # Configure AWS CLI and login to ECR
 aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
