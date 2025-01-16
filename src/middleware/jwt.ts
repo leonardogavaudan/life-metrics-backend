@@ -13,8 +13,10 @@ const verifyJwt = jwt({
 });
 
 export const jwtMiddleware = async (c: Context, next: Next) => {
-  await verifyJwt(c, next);
-  const payload = c.get("jwtPayload") as JwtPayload;
-  c.set("user", payload);
-  await next();
+  await verifyJwt(c, async () => {
+    const payload = c.get("jwtPayload") as JwtPayload;
+    console.log("Payload: ", payload);
+    c.set("user", payload);
+    await next();
+  });
 };
