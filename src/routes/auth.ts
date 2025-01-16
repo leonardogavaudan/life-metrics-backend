@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { upsertUser, User } from "../database/user";
 import jwt from "jsonwebtoken";
-import { createProtectedRouter } from "../middleware/jwt";
+import { jwtMiddleware } from "../middleware/jwt";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
@@ -21,14 +21,13 @@ function generateToken(user: User): string {
 }
 
 export const authRouter = new Hono();
-const protectedRoutes = createProtectedRouter(authRouter);
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   "https://app.lifemetrics.io/login"
 );
 
-protectedRoutes.get("/validate", async (c: Context) => {
+authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
   const user = c.get("user");
   return c.json({
     id: user.id,
