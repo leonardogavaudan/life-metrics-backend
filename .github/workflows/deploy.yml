@@ -56,9 +56,9 @@ jobs:
 
       - name: Copy deployment scripts
         run: |
+          # Copy deploy script and entire db folder
           rsync -av scripts/deploy.sh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:~/deploy.sh
-          rsync -av db/migrate.sh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:~/migrate.sh
-          rsync -avr db/migrations ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:~/migrations
+          rsync -av --delete db/ ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:~/db/
 
       - name: Execute deployment script
         uses: appleboy/ssh-action@master

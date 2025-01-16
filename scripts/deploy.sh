@@ -57,11 +57,9 @@ aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 aws configure set region ${AWS_REGION}
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
-# Create deployment directory
+# Create required directories
 mkdir -p ~/life-metrics-backend
 cd ~/life-metrics-backend
-
-# Ensure postgres_data directory exists
 mkdir -p ~/life-metrics-backend/postgres_data
 
 # Create .env file with secrets
@@ -113,7 +111,7 @@ done
 
 # Run database migrations
 echo "Running database migrations..."
-chmod +x ~/migrate.sh
-~/migrate.sh
+chmod +x ~/db/migrate.sh
+~/db/migrate.sh
 
 echo "Deployment completed successfully!"
