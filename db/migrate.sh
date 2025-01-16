@@ -20,16 +20,16 @@ DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
 # Check migration status
 echo "Checking migration status..."
 STATUS_OUTPUT=$(goose -dir "$SCRIPT_DIR/migrations" postgres "$DB_URL" status)
-PENDING_MIGRATIONS=$(echo "$STATUS_OUTPUT" | grep -c "Pending" || true)
 
-if [ "$PENDING_MIGRATIONS" -eq "0" ]; then
+# More reliable way to check for pending migrations
+if ! echo "$STATUS_OUTPUT" | grep -q "Pending"; then
     echo "✅ No pending migrations"
     echo "Current status:"
     echo "$STATUS_OUTPUT"
     exit 0
 fi
 
-echo "Found $PENDING_MIGRATIONS pending migrations:"
+echo "Found pending migrations:"
 echo "$STATUS_OUTPUT" | grep "Pending"
 echo "Applying pending migrations..."
 
