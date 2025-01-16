@@ -36,6 +36,15 @@ echo "Installing required packages..."
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose unzip curl
 
+# Install goose if not already installed
+if ! command -v goose &> /dev/null; then
+    echo "Installing goose..."
+    GOOSE_VERSION="v3.18.0"
+    curl -fsSL "https://github.com/pressly/goose/releases/download/${GOOSE_VERSION}/goose_linux_x86_64" -o goose
+    chmod +x goose
+    sudo mv goose /usr/local/bin/
+fi
+
 # Install/Update AWS CLI
 echo "Installing/Updating AWS CLI..."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -83,5 +92,21 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
 # Start services
 echo "Starting services..."
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# Wait for PostgreSQL to be ready
+echo "Waiting for PostgreSQL to be ready..."
+for i in {1..30}; do
+    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db pg_isready -U ${POSTGRES_USER} > /dev/null 2>&1; then
+        echo "PostgreSQL is ready!"
+        break
+    fi
+    echo "Waiting for PostgreSQL... (attempt $i/30)"
+    sleep 2
+done
+
+# Run database migrations
+echo "Running database migrations..."
+chmod +x ~/migrate.sh
+~/migrate.sh
 
 echo "Deployment completed successfully!"

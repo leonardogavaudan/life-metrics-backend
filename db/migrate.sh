@@ -17,10 +17,27 @@ set +a
 # Construct the database URL
 DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB?sslmode=disable"
 
+# Check migration status
+echo "Checking migration status..."
+STATUS_OUTPUT=$(goose -dir "$SCRIPT_DIR/migrations" postgres "$DB_URL" status)
+PENDING_MIGRATIONS=$(echo "$STATUS_OUTPUT" | grep -c "Pending" || true)
+
+if [ "$PENDING_MIGRATIONS" -eq "0" ]; then
+    echo "✅ No pending migrations"
+    echo "Current status:"
+    echo "$STATUS_OUTPUT"
+    exit 0
+fi
+
+echo "Found $PENDING_MIGRATIONS pending migrations:"
+echo "$STATUS_OUTPUT" | grep "Pending"
+echo "Applying pending migrations..."
+
 # Run goose migrations
 if goose -dir "$SCRIPT_DIR/migrations" postgres "$DB_URL" up; then
-    echo "✅ Successfully ran all migrations"
+    echo "✅ Successfully applied the following migrations:"
+    echo "$STATUS_OUTPUT" | grep "Pending" | awk '{print "  ✓", $1, $2}'
 else
-    echo "❌ Failed to run migrations"
+    echo "❌ Failed to apply migrations"
     exit 1
 fi
