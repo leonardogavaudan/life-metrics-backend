@@ -3,115 +3,40 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+
+env:
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  IMAGE_TAG: ${{ github.sha }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 jobs:
-  check-migrations:
-    runs-on: ubuntu-latest
-    outputs:
-      has_changes: ${{ steps.check_changes.outputs.any_changed }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - name: Check for migration changes
-        id: check_changes
-        uses: tj-actions/changed-files@v40
-        with:
-          files: |
-            db/migrations/**
-
-  run-migrations:
-    runs-on: ubuntu-latest
-    needs: check-migrations
-    if: needs.check-migrations.outputs.has_changes == 'true'
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Deploy to VPS and Run Migrations
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd ~/life-metrics-backend
-            docker-compose -f docker-compose.prod.yml run --rm app ./db/migrate.sh
-
   deploy:
     runs-on: ubuntu-latest
-    needs: [check-migrations, run-migrations]
-    if: always() && needs.check-migrations.result != 'failure'
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and push Docker image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: life-metrics-backend
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: life-metrics-backend
-          IMAGE_TAG: ${{ github.sha }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+      - name: Copy deployment script to VPS
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,GITHUB_REPOSITORY
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "scripts/deploy.sh"
+          target: "~/"
+          strip_components: 1
+
+      - name: Execute deployment script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,VPS_USERNAME,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,JWT_SECRET,GITHUB_REPOSITORY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION
           script: |
-            # Install AWS CLI
-            echo "Installing AWS CLI..."
-            sudo apt-get update
-            sudo apt-get install -y unzip
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip -q awscliv2.zip
-            sudo ./aws/install
-            rm -rf aws awscliv2.zip
-
-            # Download deployment script
-            curl -o deploy.sh https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/deploy.sh
-            chmod +x deploy.sh
-
-            # Configure AWS credentials on VPS
-            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws configure set region ${{ secrets.AWS_REGION }}
-
-            # Login to ECR
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
-
-            # Run deployment script
-            ECR_REGISTRY=$ECR_REGISTRY \
-            ECR_REPOSITORY=$ECR_REPOSITORY \
-            IMAGE_TAG=$IMAGE_TAG \
-            POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-            POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-            VPS_USERNAME=${{ secrets.VPS_USERNAME }} \
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-            GITHUB_REPOSITORY=${{ github.repository }} \
-            ./deploy.sh
+            chmod +x ~/deploy.sh
+            ~/deploy.sh

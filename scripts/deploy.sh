@@ -11,6 +11,10 @@ set -e
 # - VPS_USERNAME
 # - GOOGLE_CLIENT_ID
 # - GOOGLE_CLIENT_SECRET
+# - JWT_SECRET
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_REGION
 
 # Ensure all required variables are set
 : "${ECR_REGISTRY:?Need to set ECR_REGISTRY}"
@@ -22,11 +26,27 @@ set -e
 : "${VPS_USERNAME:?Need to set VPS_USERNAME}"
 : "${GOOGLE_CLIENT_ID:?Need to set GOOGLE_CLIENT_ID}"
 : "${GOOGLE_CLIENT_SECRET:?Need to set GOOGLE_CLIENT_SECRET}"
+: "${JWT_SECRET:?Need to set JWT_SECRET}"
+: "${AWS_ACCESS_KEY_ID:?Need to set AWS_ACCESS_KEY_ID}"
+: "${AWS_SECRET_ACCESS_KEY:?Need to set AWS_SECRET_ACCESS_KEY}"
+: "${AWS_REGION:?Need to set AWS_REGION}"
 
-# Ensure Docker and Docker Compose are installed
-echo "Installing Docker and Docker Compose..."
+# Install required packages
+echo "Installing required packages..."
 sudo apt-get update
-sudo apt-get install -y docker.io docker-compose
+sudo apt-get install -y docker.io docker-compose unzip curl
+
+# Install AWS CLI
+echo "Installing AWS CLI..."
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# Configure AWS CLI and login to ECR
+aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+aws configure set region ${AWS_REGION}
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
 # Create deployment directory
 mkdir -p ~/life-metrics-backend
@@ -45,6 +65,7 @@ ECR_REPOSITORY=${ECR_REPOSITORY}
 IMAGE_TAG=${IMAGE_TAG}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+JWT_SECRET=${JWT_SECRET}
 EOL
 
 # Download docker-compose files
