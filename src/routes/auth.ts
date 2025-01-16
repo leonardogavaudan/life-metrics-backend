@@ -77,8 +77,6 @@ authRouter.post("/google/callback", async (c) => {
     return c.json({
       user,
       token,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
     });
   } catch (error) {
     return c.json({ error: "Authentication failed" }, 401);
