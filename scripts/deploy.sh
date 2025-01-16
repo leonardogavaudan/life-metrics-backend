@@ -39,7 +39,7 @@ sudo apt-get install -y docker.io docker-compose unzip curl
 # Install/Update AWS CLI
 echo "Installing/Updating AWS CLI..."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
+unzip -o awscliv2.zip  # -o flag to overwrite files without prompting
 sudo ./aws/install --update
 
 # Configure AWS CLI and login to ECR
