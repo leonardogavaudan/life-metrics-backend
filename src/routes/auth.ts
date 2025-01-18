@@ -21,11 +21,19 @@ function generateToken(user: User): string {
 }
 
 export const authRouter = new Hono();
-const oAuth2Client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  "https://app.lifemetrics.io/login"
-);
+const getRedirectUri = (c: Context) => {
+  const isDevelopment = c.req.header("X-Environment") === "development";
+  return isDevelopment
+    ? "http://localhost:5173/login"
+    : "https://app.lifemetrics.io/login";
+};
+
+const oAuth2Client = (c: Context) =>
+  new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    getRedirectUri(c)
+  );
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
   const user = c.get("user");
@@ -36,7 +44,7 @@ authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
 });
 
 authRouter.get("/google", (c) => {
-  const authorizeUrl = oAuth2Client.generateAuthUrl({
+  const authorizeUrl = oAuth2Client(c).generateAuthUrl({
     access_type: "offline",
     scope: ["email", "profile"],
   });
@@ -48,8 +56,9 @@ authRouter.post("/google/callback", async (c) => {
   const { code } = await c.req.json();
 
   try {
-    const { tokens } = await oAuth2Client.getToken(code);
-    const ticket = await oAuth2Client.verifyIdToken({
+    const client = oAuth2Client(c);
+    const { tokens } = await client.getToken(code);
+    const ticket = await client.verifyIdToken({
       idToken: tokens.id_token!,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
