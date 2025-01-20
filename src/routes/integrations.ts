@@ -38,6 +38,11 @@ const INTEGRATION_DETAILS: Record<
     description: "Connect your Garmin device to track your fitness activities",
     status: IntegrationStatus.ComingSoon,
   },
+  coros: {
+    name: "COROS",
+    description: "Track your training and performance with COROS integration",
+    status: IntegrationStatus.ComingSoon,
+  },
 };
 
 const integrationsRouter = new Hono();

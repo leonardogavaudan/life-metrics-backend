@@ -4,6 +4,7 @@ export const INTEGRATIONS = {
   oura: "oura",
   apple_health: "apple_health",
   garmin: "garmin",
+  coros: "coros",
 } as const;
 
 export type IntegrationProvider = keyof typeof INTEGRATIONS;
