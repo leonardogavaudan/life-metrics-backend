@@ -12,5 +12,5 @@ usersRouter.get("/me", jwtMiddleware, async (c) => {
     return c.json({ message: "User not found" }, 404);
   }
 
-  return c.json(user);
+  return c.json({ user });
 });
