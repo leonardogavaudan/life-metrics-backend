@@ -39,7 +39,7 @@ export async function upsertUser(user: CreateUser): Promise<User> {
       ${user.name},
       ${user.picture_url || null}
     )
-    ON CONFLICT (email) 
+    ON CONFLICT (email)
     DO UPDATE SET
       google_id = EXCLUDED.google_id,
       name = EXCLUDED.name,
@@ -49,4 +49,14 @@ export async function upsertUser(user: CreateUser): Promise<User> {
   `;
 
   return newUser;
+}
+
+export async function deleteUserById(id: string): Promise<boolean> {
+  const result = await sql`
+    DELETE FROM users
+    WHERE id = ${id}
+    RETURNING id
+  `;
+
+  return result.length > 0;
 }
