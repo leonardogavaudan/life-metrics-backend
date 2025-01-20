@@ -17,6 +17,14 @@ export type CreateUser = Omit<
   picture_url?: string;
 };
 
+export async function getUserById(id: string): Promise<User | null> {
+  const [user] = await sql<User[]>`
+    SELECT * FROM users WHERE id = ${id}
+  `;
+
+  return user || null;
+}
+
 export async function upsertUser(user: CreateUser): Promise<User> {
   const [newUser] = await sql<User[]>`
     INSERT INTO users (
