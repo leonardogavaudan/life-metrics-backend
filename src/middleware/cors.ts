@@ -9,7 +9,7 @@ export const corsMiddleware = (): MiddlewareHandler => {
       "Authorization",
       "Content-Type",
       "Accept",
-      "x-environment",
+      "X-Environment",
       "User-Agent",
       "Referer",
     ],
