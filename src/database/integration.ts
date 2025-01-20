@@ -1,13 +1,5 @@
 import { sql } from "./connection";
-
-export interface Integration {
-  id: string;
-  user_id: string;
-  provider: string;
-  credentials: Record<string, unknown>;
-  created_at: Date;
-  updated_at: Date;
-}
+import { Integration } from "./integration/types";
 
 export async function getIntegrationsByUserId(
   userId: string
@@ -17,3 +9,5 @@ export async function getIntegrationsByUserId(
     WHERE user_id = ${userId}
   `;
 }
+
+export * from "./integration/types";
