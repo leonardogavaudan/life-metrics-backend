@@ -1,6 +1,7 @@
 export enum IntegrationStatus {
   Available = "available",
   Connected = "connected",
+  ComingSoon = "coming_soon",
 }
 
 export interface ApiIntegration {

@@ -9,29 +9,34 @@ import { ApiIntegration, IntegrationStatus } from "./integrations/types";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,
-  { name: string; description: string }
+  { name: string; description: string; status: IntegrationStatus }
 > = {
-  strava: {
-    name: "Strava",
+  whoop: {
+    name: "Whoop",
     description:
-      "Connect your Strava account to track your running and cycling activities",
+      "Track your strain, recovery, and sleep with Whoop integration",
+    status: IntegrationStatus.ComingSoon,
   },
   fitbit: {
     name: "Fitbit",
     description: "Sync your Fitbit data to track steps, sleep, and activity",
+    status: IntegrationStatus.ComingSoon,
   },
   oura: {
     name: "Oura Ring",
     description: "Import your sleep and recovery data from Oura Ring",
+    status: IntegrationStatus.Available,
   },
   apple_health: {
     name: "Apple Health",
     description:
       "Sync your Apple Health data for comprehensive health tracking",
+    status: IntegrationStatus.ComingSoon,
   },
   garmin: {
     name: "Garmin",
     description: "Connect your Garmin device to track your fitness activities",
+    status: IntegrationStatus.ComingSoon,
   },
 };
 
@@ -65,7 +70,7 @@ integrationsRouter.get("/", async (c) => {
       provider,
       name: INTEGRATION_DETAILS[provider].name,
       description: INTEGRATION_DETAILS[provider].description,
-      status: IntegrationStatus.Available,
+      status: INTEGRATION_DETAILS[provider].status,
     }));
 
   return c.json({

@@ -1,5 +1,5 @@
 export const INTEGRATIONS = {
-  strava: "strava",
+  whoop: "whoop",
   fitbit: "fitbit",
   oura: "oura",
   apple_health: "apple_health",
