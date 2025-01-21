@@ -15,6 +15,8 @@ set -e
 # - AWS_ACCESS_KEY_ID
 # - AWS_SECRET_ACCESS_KEY
 # - AWS_REGION
+# - OURA_CLIENT_ID
+# - OURA_CLIENT_SECRET
 
 # Ensure all required variables are set
 : "${ECR_REGISTRY:?Need to set ECR_REGISTRY}"
@@ -30,6 +32,8 @@ set -e
 : "${AWS_ACCESS_KEY_ID:?Need to set AWS_ACCESS_KEY_ID}"
 : "${AWS_SECRET_ACCESS_KEY:?Need to set AWS_SECRET_ACCESS_KEY}"
 : "${AWS_REGION:?Need to set AWS_REGION}"
+: "${OURA_CLIENT_ID:?Need to set OURA_CLIENT_ID}"
+: "${OURA_CLIENT_SECRET:?Need to set OURA_CLIENT_SECRET}"
 
 # Install required packages
 echo "Installing required packages..."
@@ -73,6 +77,8 @@ IMAGE_TAG=${IMAGE_TAG}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 JWT_SECRET=${JWT_SECRET}
+OURA_CLIENT_ID=${OURA_CLIENT_ID}
+OURA_CLIENT_SECRET=${OURA_CLIENT_SECRET}
 EOL
 
 # Download docker-compose files
