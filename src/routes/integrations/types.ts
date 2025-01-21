@@ -44,7 +44,7 @@ export const OAUTH_CONFIGS: Partial<Record<IntegrationProvider, OAuthConfig>> =
       tokenUrl: "https://api.ouraring.com/oauth/token",
       clientId: process.env.OURA_CLIENT_ID!,
       clientSecret: process.env.OURA_CLIENT_SECRET!,
-      scope: ["daily", "heartrate", "personal", "session", "workout"],
+      scope: ["daily", "heartrate", "personal", "workout"],
       redirectPath: "/integrations/oauth/callback",
     },
   };
