@@ -61,7 +61,7 @@ const getRedirectUri = (c: Context, provider: IntegrationProvider) => {
   const isDevelopment = c.req.header("X-Environment") === "development";
   const baseUrl = isDevelopment
     ? "http://localhost:5173"
-    : "https://api.lifemetrics.io";
+    : "https://app.lifemetrics.io";
 
   const config = OAUTH_CONFIGS[provider];
   if (!config)
