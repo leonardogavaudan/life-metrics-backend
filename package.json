@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.7",
+    "axios": "^1.7.9",
     "google-auth-library": "^9.15.0",
     "hono": "^4.6.16",
     "jsonwebtoken": "^9.0.2",
