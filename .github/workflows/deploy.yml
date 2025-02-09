@@ -23,7 +23,7 @@ env:
   OURA_CLIENT_SECRET: ${{ secrets.OURA_CLIENT_SECRET }}
 
 jobs:
-  deploy:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,6 +44,12 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -55,7 +61,6 @@ jobs:
 
       - name: Copy deployment scripts
         run: |
-          # Copy deploy script and entire db folder
           rsync -av scripts/deploy.sh ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/deploy.sh
           rsync -av --delete db/ ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/db/
 
