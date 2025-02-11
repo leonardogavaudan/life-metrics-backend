@@ -4,7 +4,7 @@ CREATE TABLE integration_daily_metrics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   resolved_daily_metric_id UUID NOT NULL REFERENCES resolved_daily_metrics(id) ON DELETE CASCADE,
   integration_id UUID NOT NULL REFERENCES integration(id) ON DELETE CASCADE,
-  metric_type NOT NULL VARCHAR(50) NOT NULL,
+  metric_type VARCHAR(50) NOT NULL,
   value NUMERIC NOT NULL,
   unit VARCHAR(50) NOT NULL,
   event_date DATE NOT NULL,
