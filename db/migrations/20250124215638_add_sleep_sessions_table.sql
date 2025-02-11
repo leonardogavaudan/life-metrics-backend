@@ -7,7 +7,7 @@ CREATE TABLE sleep_sessions (
   start_timestamp TIMESTAMPTZ NOT NULL,
   end_timestamp TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (user_id, start_timestamp, integration_id)
 );
 
