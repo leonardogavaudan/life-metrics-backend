@@ -12,7 +12,7 @@ CREATE TABLE sleep_sessions (
 );
 
 CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON time_series_metrics
+    BEFORE UPDATE ON sleep_sessions
     FOR EACH ROW
     EXECUTE FUNCTION trigger_set_timestamp();
 -- +goose StatementEnd
