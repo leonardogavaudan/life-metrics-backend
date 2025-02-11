@@ -1,8 +1,8 @@
 import { Context, Hono } from "hono";
 import { OAuth2Client } from "google-auth-library";
-import { upsertUser, User } from "../database/user";
+import { upsertUser, User } from "../../database/user";
 import jwt from "jsonwebtoken";
-import { jwtMiddleware } from "../middleware/jwt";
+import { jwtMiddleware } from "../../middleware/jwt";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {

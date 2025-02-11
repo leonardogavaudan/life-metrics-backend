@@ -1,6 +1,7 @@
 import { Hono } from "hono";
-import { getUserById, deleteUserById } from "../database/user";
-import { jwtMiddleware, JwtPayload } from "../middleware/jwt";
+
+import { getUserById, deleteUserById } from "../../database/user";
+import { jwtMiddleware, JwtPayload } from "../../middleware/jwt";
 
 export const usersRouter = new Hono();
 

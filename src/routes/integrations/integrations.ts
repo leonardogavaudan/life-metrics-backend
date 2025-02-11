@@ -1,19 +1,19 @@
 import { Context, Hono } from "hono";
-import { jwtMiddleware, JwtPayload } from "../middleware/jwt";
+import { jwtMiddleware, JwtPayload } from "../../middleware/jwt";
 import axios from "axios";
 import {
   getIntegrationsByUserId,
   upsertIntegration,
   INTEGRATIONS,
   IntegrationProvider,
-} from "../database/integration";
+} from "../../database/integration";
 import {
   ApiIntegration,
   IntegrationStatus,
   OAUTH_CONFIGS,
   OAuthState,
   OAuthTokenResponse,
-} from "./integrations/types";
+} from "./types";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,
