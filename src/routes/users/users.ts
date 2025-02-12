@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 
 import { getUserById, deleteUserById } from "../../database/user";
-import { jwtValidationMiddleware, JwtPayload } from "../../middleware/jwt";
+import { jwtMiddleware, JwtPayload } from "../../middleware/jwt";
 
 export const usersRouter = new Hono();
 
-usersRouter.get("/me", jwtValidationMiddleware, async (c) => {
+usersRouter.get("/me", jwtMiddleware, async (c) => {
   const { id } = c.get("jwtPayload") as JwtPayload;
 
   const user = await getUserById(id);
@@ -16,7 +16,7 @@ usersRouter.get("/me", jwtValidationMiddleware, async (c) => {
   return c.json({ user });
 });
 
-usersRouter.delete("/me", jwtValidationMiddleware, async (c) => {
+usersRouter.delete("/me", jwtMiddleware, async (c) => {
   const { id } = c.get("jwtPayload") as JwtPayload;
 
   const deleted = await deleteUserById(id);
