@@ -1,35 +1,33 @@
-export const INTEGRATIONS = {
-  whoop: "whoop",
-  fitbit: "fitbit",
-  oura: "oura",
-  apple_health: "apple_health",
-  garmin: "garmin",
-  coros: "coros",
+import { z } from "zod";
+
+export const IntegrationProvider = {
+  Whoop: "whoop",
+  Fitbit: "fitbit",
+  Oura: "oura",
+  AppleHealth: "apple_health",
+  Garmin: "garmin",
+  Coros: "coros",
 } as const;
+export type IntegrationProvider = typeof IntegrationProvider[keyof typeof IntegrationProvider];
 
-export type IntegrationProvider = keyof typeof INTEGRATIONS;
+export const OAuthCredentials = z.object({
+  token_type: z.string(),
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  scope: z.optional(z.string())
+})
+export type OAuthCredentials = z.infer<typeof OAuthCredentials>
 
-export interface OAuthCredentials {
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-  token_type: string;
-  scope?: string;
-}
-
-export interface AppleHealthCredentials {
-  // Apple Health specific credentials if needed
-  // This is a placeholder since Apple Health might use a different auth mechanism
-  authorization_key: string;
-}
+export const AppleHealthCredentials = OAuthCredentials.extend({
+  authorization_key: z.string()
+})
+export type AppleHealthCredentials = z.infer<typeof AppleHealthCredentials>
 
 export type IntegrationCredentials = {
-  [INTEGRATIONS.whoop]: OAuthCredentials;
-  [INTEGRATIONS.fitbit]: OAuthCredentials;
-  [INTEGRATIONS.oura]: OAuthCredentials;
-  [INTEGRATIONS.garmin]: OAuthCredentials;
-  [INTEGRATIONS.coros]: OAuthCredentials;
-  [INTEGRATIONS.apple_health]: AppleHealthCredentials;
+  [key in typeof IntegrationProvider[keyof typeof IntegrationProvider]]: key extends typeof IntegrationProvider.AppleHealth
+  ? AppleHealthCredentials
+  : OAuthCredentials;
 };
 
 export interface Integration {
@@ -40,3 +38,4 @@ export interface Integration {
   created_at: Date;
   updated_at: Date;
 }
+

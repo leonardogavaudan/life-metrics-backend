@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { upsertUser, User } from "../../database/user";
 import jwt from "jsonwebtoken";
-import { jwtMiddleware } from "../../middleware/jwt";
+import { jwtValidationMiddleware } from "../../middleware/jwt";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
@@ -35,7 +35,7 @@ const oAuth2Client = (c: Context) =>
     getRedirectUri(c)
   );
 
-authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
+authRouter.get("/validate", jwtValidationMiddleware, async (c: Context) => {
   const user = c.get("user");
   return c.json({
     id: user.id,

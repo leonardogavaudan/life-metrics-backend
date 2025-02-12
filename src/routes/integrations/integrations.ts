@@ -1,11 +1,9 @@
 import { Context, Hono } from "hono";
-import { jwtMiddleware, JwtPayload } from "../../middleware/jwt";
+import { jwtValidationMiddleware, JwtPayload } from "../../middleware/jwt";
 import axios from "axios";
 import {
   getIntegrationsByUserId,
   upsertIntegration,
-  INTEGRATIONS,
-  IntegrationProvider,
 } from "../../database/integration";
 import {
   ApiIntegration,
@@ -14,6 +12,7 @@ import {
   OAuthState,
   OAuthTokenResponse,
 } from "./types";
+import { IntegrationProvider } from "../../database/integration/types";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,
@@ -55,7 +54,7 @@ const INTEGRATION_DETAILS: Record<
 
 const integrationsRouter = new Hono();
 
-integrationsRouter.use("*", jwtMiddleware);
+integrationsRouter.use("*", jwtValidationMiddleware);
 
 const getRedirectUri = (c: Context, provider: IntegrationProvider) => {
   const isDevelopment = c.req.header("X-Environment") === "development";
@@ -88,7 +87,7 @@ integrationsRouter.get("/", async (c) => {
     }));
 
   const availableIntegrations: ApiIntegration[] = (
-    Object.keys(INTEGRATIONS) as IntegrationProvider[]
+    Object.keys(IntegrationProvider) as IntegrationProvider[]
   )
     .filter((provider) => !connectedProviders.has(provider))
     .map((provider) => ({

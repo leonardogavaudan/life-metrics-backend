@@ -25,14 +25,14 @@ export async function getIntegrationByUserIdAndProvider(
 export async function upsertIntegration(
   userId: string,
   provider: IntegrationProvider,
-  credentials: Record<string, unknown>
+  credentials: Integration["credentials"]
 ): Promise<Integration> {
   const [integration] = await sql<Integration[]>`
     INSERT INTO integrations (user_id, provider, credentials)
-    VALUES (${userId}, ${provider}, ${JSON.stringify(credentials)})
+    VALUES (${userId}, ${provider}, ${sql.json(credentials)})
     ON CONFLICT (user_id, provider)
     DO UPDATE SET
-      credentials = ${JSON.stringify(credentials)},
+      credentials = ${sql.json(credentials)},
       updated_at = CURRENT_TIMESTAMP
     RETURNING *
   `;
@@ -49,4 +49,10 @@ export async function deleteIntegration(
   `;
 }
 
-export * from "./integration/types";
+export async function updateIntegrationCredentials(id: string, credentials: Integration["credentials"]) {
+  await sql`
+    UPDATE integrations
+    SET credentials = ${sql.json(credentials)}
+    WHERE id = ${id}
+  `;
+}
