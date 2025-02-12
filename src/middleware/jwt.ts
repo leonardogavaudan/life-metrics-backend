@@ -23,7 +23,7 @@ if (!JWT_SECRET) {
 export const jwtContextMiddleware = async (c: Context, next: Next) => {
   const payload = c.get("jwtPayload") as JwtPayload;
   const jwtContext = createNewContext({ user: payload });
-  contextStorage.run(jwtContext, async () => {
+  await contextStorage.run(jwtContext, async () => {
     await next();
   });
 };
