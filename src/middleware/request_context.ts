@@ -4,7 +4,7 @@ import { contextStorage, createNewContext } from "../context"
 
 export const requestContextMiddleware = async (_: Context, next: Next) => {
   const newContext = createNewContext({ requestId: nanoid() })
-  contextStorage.run(
+  await contextStorage.run(
     newContext, async () => {
       await next()
     }

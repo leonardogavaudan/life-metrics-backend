@@ -21,19 +21,20 @@ function generateToken(user: User): string {
 }
 
 export const authRouter = new Hono();
-const getRedirectUri = (c: Context) => {
+function getRedirectUri(c: Context) {
   const isDevelopment = c.req.header("X-Environment") === "development";
   return isDevelopment
     ? "http://localhost:5173/login"
     : "https://app.lifemetrics.io/login";
-};
+}
 
-const oAuth2Client = (c: Context) =>
-  new OAuth2Client(
+function oAuth2Client(c: Context) {
+  return new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
     getRedirectUri(c)
   );
+}
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
   const user = c.get("user");
