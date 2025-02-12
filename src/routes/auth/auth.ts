@@ -39,7 +39,10 @@ function oAuth2Client(c: Context) {
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
   const jwtContext = getContextWithValidation(JwtContext)
-  if (jwtContext.error) throw new Error("Failed to get jwt context")
+  if (jwtContext.error) {
+    console.log(jwtContext.error)
+    throw jwtContext.error
+  }
 
   return c.json({
     id: jwtContext.data.user.id,
