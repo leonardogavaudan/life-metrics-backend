@@ -2,7 +2,8 @@ import { Context, Hono } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { upsertUser, User } from "../../database/user";
 import jwt from "jsonwebtoken";
-import { jwtMiddleware } from "../../middleware/jwt";
+import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
+import { getContextWithValidation } from "../../context";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
@@ -37,10 +38,12 @@ function oAuth2Client(c: Context) {
 }
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
-  const user = c.get("user");
+  const jwtContext = getContextWithValidation(JwtContext)
+  if (jwtContext.error) throw new Error("Failed to get jwt context")
+
   return c.json({
-    id: user.id,
-    email: user.email,
+    id: jwtContext.data.user.id,
+    email: jwtContext.data.user.email,
   });
 });
 
