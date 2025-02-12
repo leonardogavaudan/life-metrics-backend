@@ -21,8 +21,8 @@ if (!JWT_SECRET) {
 }
 
 export const jwtContextMiddleware = async (c: Context, next: Next) => {
-  const payload = c.get("jwtPayload") as JwtPayload;
-  console.log("logging hono context", c)
+  const payload = c.get("jwtPayload");
+  console.log("logging hono payload", c.get(payload))
   const jwtContext = createNewContext({ user: payload });
   await contextStorage.run(jwtContext, async () => {
     await next();
@@ -32,5 +32,5 @@ export const jwtContextMiddleware = async (c: Context, next: Next) => {
 export const jwtValidationMiddleware = jwt({ secret: JWT_SECRET });
 
 export const jwtMiddleware = every(
-  jwtContextMiddleware, jwtValidationMiddleware
+  jwtValidationMiddleware, jwtContextMiddleware
 )
