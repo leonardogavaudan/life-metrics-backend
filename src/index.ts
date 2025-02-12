@@ -7,7 +7,7 @@ import { requestContextMiddleware } from "./middleware/request_context";
 
 const app = new Hono();
 
-app.use(requestContextMiddleware)
+app.use("*", requestContextMiddleware)
 app.use("*", corsMiddleware);
 
 app.route("/auth", authRouter);
