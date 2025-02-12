@@ -2,6 +2,7 @@ import { Context, Next } from "hono";
 import { jwt } from "hono/jwt";
 import { contextStorage, createNewContext } from "../context";
 import { z } from "zod";
+import { every } from "hono/combine";
 
 const JwtPayload = z.object({
   id: z.string(),
@@ -29,9 +30,6 @@ export const jwtContextMiddleware = async (c: Context, next: Next) => {
 
 export const jwtValidationMiddleware = jwt({ secret: JWT_SECRET });
 
-export const jwtMiddleware = async (c: Context, next: Next) => {
-  await jwtContextMiddleware(c, async () => {
-    await jwtValidationMiddleware(c, next);
-  });
-};
-
+export const jwtMiddleware = every(
+  jwtContextMiddleware, jwtValidationMiddleware
+)
