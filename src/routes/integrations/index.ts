@@ -77,10 +77,7 @@ integrationsRouter.get("/", async (c) => {
     connectedIntegrations.map((i) => i.provider)
   );
 
-  console.log("connected providers", connectedProviders)
-  console.log(INTEGRATION_DETAILS)
-
-  const transformedConnectedIntegrations: ApiIntegration[] =
+  const transformedConnectedIntegrations =
     connectedIntegrations.map((integration) => ({
       id: integration.id,
       provider: integration.provider,
@@ -89,17 +86,16 @@ integrationsRouter.get("/", async (c) => {
       status: IntegrationStatus.Connected,
     }));
 
-  const availableIntegrations: ApiIntegration[] = (
-    Object.keys(IntegrationProvider) as IntegrationProvider[]
-  )
-    .filter((provider) => !connectedProviders.has(provider))
-    .map((provider) => ({
-      id: null,
-      provider,
-      name: INTEGRATION_DETAILS[provider].name,
-      description: INTEGRATION_DETAILS[provider].description,
-      status: INTEGRATION_DETAILS[provider].status,
-    }));
+  const availableIntegrations =
+    Object.values(IntegrationProvider)
+      .filter((provider) => !connectedProviders.has(provider))
+      .map((provider) => ({
+        id: null,
+        provider,
+        name: INTEGRATION_DETAILS[provider].name,
+        description: INTEGRATION_DETAILS[provider].description,
+        status: INTEGRATION_DETAILS[provider].status,
+      }));
 
   return c.json({
     integrations: [
