@@ -3,7 +3,7 @@ import { OAuth2Client } from "google-auth-library";
 import { upsertUser, User } from "../../database/user";
 import jwt from "jsonwebtoken";
 import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
-import { contextStorage, getContextWithValidation } from "../../context";
+import { getContextWithValidation } from "../../context";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
@@ -38,12 +38,8 @@ function oAuth2Client(c: Context) {
 }
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
-  const context = contextStorage.getStore();
-  console.log("context:", context)
-
   const jwtContext = getContextWithValidation(JwtContext)
   if (jwtContext.error) {
-    console.log(jwtContext.error)
     throw jwtContext.error
   }
 

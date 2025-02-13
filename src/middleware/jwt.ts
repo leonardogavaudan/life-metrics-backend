@@ -22,7 +22,6 @@ if (!JWT_SECRET) {
 
 export const jwtContextMiddleware = async (c: Context, next: Next) => {
   const payload = c.get("jwtPayload");
-  console.log("logging hono payload", c.get(payload))
   const jwtContext = createNewContext({ user: payload });
   await contextStorage.run(jwtContext, async () => {
     await next();
