@@ -31,20 +31,20 @@ export interface OAuthState {
 
 export interface OAuthTokenResponse {
   access_token: string;
-  refresh_token?: string;
+  refresh_token: string;
   expires_in: number;
   token_type: string;
   scope?: string;
 }
 
 export const OAUTH_CONFIGS: Partial<Record<IntegrationProvider, OAuthConfig>> =
-  {
-    oura: {
-      authUrl: "https://cloud.ouraring.com/oauth/authorize",
-      tokenUrl: "https://api.ouraring.com/oauth/token",
-      clientId: process.env.OURA_CLIENT_ID!,
-      clientSecret: process.env.OURA_CLIENT_SECRET!,
-      scope: ["daily", "heartrate", "personal", "workout"],
-      redirectPath: "/integrations/oauth/callback",
-    },
-  };
+{
+  [IntegrationProvider.Oura]: {
+    authUrl: "https://cloud.ouraring.com/oauth/authorize",
+    tokenUrl: "https://api.ouraring.com/oauth/token",
+    clientId: process.env.OURA_CLIENT_ID!,
+    clientSecret: process.env.OURA_CLIENT_SECRET!,
+    scope: ["daily", "heartrate", "personal", "workout"],
+    redirectPath: "/integrations/oauth/callback",
+  },
+};

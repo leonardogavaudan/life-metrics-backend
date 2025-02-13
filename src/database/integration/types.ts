@@ -14,7 +14,7 @@ export const OAuthCredentials = z.object({
   token_type: z.string(),
   access_token: z.string(),
   refresh_token: z.string(),
-  expires_in: z.number(),
+  expires_at: z.string().datetime(),
   scope: z.optional(z.string())
 })
 export type OAuthCredentials = z.infer<typeof OAuthCredentials>
