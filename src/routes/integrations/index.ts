@@ -77,6 +77,9 @@ integrationsRouter.get("/", async (c) => {
     connectedIntegrations.map((i) => i.provider)
   );
 
+  console.log("connected providers", connectedProviders)
+  console.log(INTEGRATION_DETAILS)
+
   const transformedConnectedIntegrations: ApiIntegration[] =
     connectedIntegrations.map((integration) => ({
       id: integration.id,
