@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "Starting deployment script"
+
 REQUIRED_VARS=(
   "ECR_REGISTRY"
   "ECR_REPOSITORY"
