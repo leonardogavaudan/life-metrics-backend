@@ -59,6 +59,10 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ env.VPS_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Copy deployment scripts
+        run: |
+          rsync -av scripts/deploy.sh ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/life-metrics-backend/deploy.sh
+
       - name: Execute deployment script
         uses: appleboy/ssh-action@master
         with:
