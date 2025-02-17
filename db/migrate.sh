@@ -2,12 +2,7 @@
 set -e
 
 # Get the directory where the script is located
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# Load environment variables from .env file
-set -a
-source ~/life-metrics-backend/.env
-set +a
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check if required variables are set
 : "${POSTGRES_USER:?POSTGRES_USER is not set}"
@@ -23,10 +18,10 @@ STATUS_OUTPUT=$(goose -dir "$SCRIPT_DIR/migrations" postgres "$DB_URL" status 2>
 
 # More reliable way to check for pending migrations
 if ! echo "$STATUS_OUTPUT" | grep -q "Pending"; then
-    echo "✅ No pending migrations"
-    echo "Current status:"
-    echo "$STATUS_OUTPUT"
-    exit 0
+  echo "✅ No pending migrations"
+  echo "Current status:"
+  echo "$STATUS_OUTPUT"
+  exit 0
 fi
 
 echo "Found pending migrations:"
@@ -35,9 +30,9 @@ echo "Applying pending migrations..."
 
 # Run goose migrations
 if goose -dir "$SCRIPT_DIR/migrations" postgres "$DB_URL" up; then
-    echo "✅ Successfully applied the following migrations:"
-    echo "$STATUS_OUTPUT" | grep "Pending" | awk '{print "  ✓", $1, $2}'
+  echo "✅ Successfully applied the following migrations:"
+  echo "$STATUS_OUTPUT" | grep "Pending" | awk '{print "  ✓", $1, $2}'
 else
-    echo "❌ Failed to apply migrations"
-    exit 1
+  echo "❌ Failed to apply migrations"
+  exit 1
 fi

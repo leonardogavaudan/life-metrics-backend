@@ -59,11 +59,6 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ env.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Copy deployment scripts
-        run: |
-          rsync -av scripts/deploy.sh ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/deploy.sh
-          rsync -av --delete db/ ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/db/
-
       - name: Execute deployment script
         uses: appleboy/ssh-action@master
         with:
@@ -73,5 +68,7 @@ jobs:
           debug: true
           envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,VPS_USERNAME,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,JWT_SECRET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,GITHUB_REPOSITORY,OURA_CLIENT_ID,OURA_CLIENT_SECRET
           script: |
-            chmod +x ~/deploy.sh
-            ~/deploy.sh
+            mkdir -p ~/life-metrics-backend
+            curl -o ~/life-metrics-backend/deploy.sh "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/scripts/deploy.sh"
+            chmod +x ~/life-metrics-backend/deploy.sh
+            ~/life-metrics-backend/deploy.sh
