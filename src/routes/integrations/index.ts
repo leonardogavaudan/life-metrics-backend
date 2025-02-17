@@ -6,7 +6,6 @@ import {
   upsertIntegration,
 } from "../../database/integration";
 import {
-  ApiIntegration,
   IntegrationStatus,
   OAUTH_CONFIGS,
   OAuthState,
@@ -52,7 +51,7 @@ const INTEGRATION_DETAILS: Record<
   },
 };
 
-const integrationsRouter = new Hono();
+export const integrationsRouter = new Hono();
 
 integrationsRouter.use("*", jwtValidationMiddleware);
 
@@ -185,5 +184,3 @@ integrationsRouter.post("/oauth/callback", async (c) => {
     return c.json({ error: "Failed to complete OAuth flow" }, 500);
   }
 });
-
-export { integrationsRouter };
