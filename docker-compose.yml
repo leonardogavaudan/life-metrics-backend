@@ -27,6 +27,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+        
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
 
 volumes:
   postgres_data:
