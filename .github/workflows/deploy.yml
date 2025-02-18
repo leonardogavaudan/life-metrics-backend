@@ -72,5 +72,4 @@ jobs:
             mkdir -p ~/life-metrics-backend
             curl -o ~/life-metrics-backend/deploy.sh "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/scripts/deploy.sh"
             chmod +x ~/life-metrics-backend/deploy.sh
-            ls -la ~/life-metrics-backend/
             ~/life-metrics-backend/deploy.sh

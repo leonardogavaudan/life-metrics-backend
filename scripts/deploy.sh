@@ -38,7 +38,8 @@ function run_migrations {
     install_goose
   fi
   echo "Running database migrations..."
-  curl -o ~/life-metrics-backend/db "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/db"
+  mkdir -p ~/life-metrics-backend/db
+  wget -qO- "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/db" | jq -r '.[].download_url' | xargs -n 1 wget -P ~/life-metrics-backend/db
   chmod +x ~/life-metrics-backend/db/migrate.sh
   ~/life-metrics-backend/db/migrate.sh
 }
