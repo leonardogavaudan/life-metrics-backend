@@ -44,8 +44,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  deploy:
-    needs: build_and_push
+  sync_files:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -59,7 +58,51 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ env.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Execute deployment script
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Create .env file
+        run: |
+          cat > .env <<EOL
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          OURA_CLIENT_ID=${{ secrets.OURA_CLIENT_ID }}
+          OURA_CLIENT_SECRET=${{ secrets.OURA_CLIENT_SECRET }}
+          EOL
+
+      - name: Sync files to VPS using rsync
+        run: |
+          FILES=(
+            "db"
+            "scripts/deploy.sh"
+            "docker-compose.yml"
+            "docker-compose.prod.yml"
+            ".env"
+          )
+          
+          rsync -avz --progress --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          "${FILES[@]}" \
+          ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }}:~/life-metrics-backend/
+
+  deploy:
+    needs: [build_and_push, sync_files]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_KEY }}
+          known_hosts: unnecessary
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ env.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Execute deployment script on VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.VPS_HOST }}
@@ -69,7 +112,6 @@ jobs:
           debug: true
           envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,VPS_USERNAME,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,JWT_SECRET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,GITHUB_REPOSITORY,OURA_CLIENT_ID,OURA_CLIENT_SECRET
           script: |
-            mkdir -p ~/life-metrics-backend
-            curl -o ~/life-metrics-backend/deploy.sh "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/scripts/deploy.sh"
             chmod +x ~/life-metrics-backend/deploy.sh
             ~/life-metrics-backend/deploy.sh
+
