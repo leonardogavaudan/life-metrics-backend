@@ -1,19 +1,34 @@
 import { nanoid } from "nanoid";
 import { Queue } from "./queue";
 
-export function createMessage<T>(queue: Queue, payload: T) {
+export function createMessage<T>(queue: Queue, payload: T): Message {
   return {
-    id: nanoid(),
-    destination: queue,
-    payload,
-    metadata: {
+    properties: {
+      id: nanoid(),
+      destination: queue,
       type: "task",
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().getTime(),
       retryCount: 0,
+      maxRetryCount: 5,
     },
+    content: Buffer.from(JSON.stringify(payload)),
   };
 }
 
-export type SyncMetricsPayload = {
+export type Message = {
+  properties: {
+    id: string;
+    destination: string;
+    type: "task" | "event";
+    timestamp: number;
+    retryCount: number;
+    maxRetryCount: number;
+  };
+  content: Buffer;
+};
+
+export type SyncMetricsMessagePayload = {
   integrationId: string;
+  startTime: string;
+  endTime: string;
 };
