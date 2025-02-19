@@ -44,6 +44,7 @@ export async function sendMessagesToQueue(
   queue: Queue,
   messages: Message[]
 ): Promise<void> {
+  console.log(`Sending ${messages.length} messages to queue ${queue}`);
   const conn = await getConnection();
   const channel = await conn.createConfirmChannel();
   for (const message of messages) {

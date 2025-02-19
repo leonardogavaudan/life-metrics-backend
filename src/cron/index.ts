@@ -5,7 +5,7 @@ import { getIntegrations } from "../database/integration";
 import { createMessage, SyncMetricsMessagePayload } from "../messaging/message";
 
 export function setupCronJobs(): void {
-  schedule("0 * * * *", async () => {
+  schedule("*/5 * * * *", async () => {
     const integrations = await getIntegrations();
     const messages = integrations.map((integration) => {
       return createMessage<SyncMetricsMessagePayload>(Queue.SyncMetrics, {
