@@ -1,6 +1,12 @@
 import { sql } from "./connection";
 import { Integration, IntegrationProvider } from "./integration/types";
 
+export async function getIntegrations(): Promise<Integration[]> {
+  return await sql<Integration[]>`
+    SELECT * FROM integrations
+  `;
+}
+
 export async function getIntegrationsByUserId(
   userId: string
 ): Promise<Integration[]> {
@@ -49,7 +55,10 @@ export async function deleteIntegration(
   `;
 }
 
-export async function updateIntegrationCredentials(id: string, credentials: Integration["credentials"]) {
+export async function updateIntegrationCredentials(
+  id: string,
+  credentials: Integration["credentials"]
+) {
   await sql`
     UPDATE integrations
     SET credentials = ${sql.json(credentials)}
