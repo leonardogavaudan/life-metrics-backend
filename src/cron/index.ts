@@ -11,7 +11,7 @@ export function setupCronJobs(): void {
       return createMessage<SyncMetricsMessagePayload>(Queue.SyncMetrics, {
         integrationId: integration.id,
         startTime: new Date().toISOString(),
-        endTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
       });
     });
     await sendMessagesToQueue(Queue.SyncMetrics, messages);
