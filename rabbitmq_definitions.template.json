@@ -6,7 +6,6 @@
       "tags": "administrator"
     }
   ],
-  "users_to_delete": ["guest"],
   "vhosts": [
     {
       "name": "/"
