@@ -14,6 +14,6 @@ export function createMessage<T>(queue: Queue, payload: T) {
   };
 }
 
-export type ImportHealthMetricsPayload = {
+export type SyncMetricsPayload = {
   integrationId: string;
 };

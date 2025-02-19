@@ -17,7 +17,9 @@ export async function getConnection(): Promise<Connection> {
 
   isConnecting = true;
   try {
-    connection = await connect("//rabbitmq");
+    connection = await connect(
+      `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASSWORD}@rabbitmq`
+    );
     connection.on("error", (err) => {
       console.error("RabbitMQ connection error:", err);
       connection = null;

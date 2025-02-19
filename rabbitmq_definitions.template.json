@@ -13,7 +13,7 @@
   ],
   "queues": [
     {
-      "name": "import_metrics",
+      "name": "sync_metrics",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,

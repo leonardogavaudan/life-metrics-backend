@@ -1,3 +1,3 @@
 export enum Queue {
-  ImportHealthMetrics = "import_health_metrics",
+  SyncMetrics = "sync_metrics",
 }
