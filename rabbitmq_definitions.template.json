@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "name": "${RABBITMQ_USER}",
+      "password": "${RABBITMQ_PASSWORD}",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "queues": [
+    {
+      "name": "import_metrics",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [],
+  "bindings": []
+}

@@ -72,6 +72,8 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           OURA_CLIENT_ID=${{ secrets.OURA_CLIENT_ID }}
           OURA_CLIENT_SECRET=${{ secrets.OURA_CLIENT_SECRET }}
+          RABBITMQ_USER=${{secrets.RABBITMQ_USER}}
+          RABBITMQ_PASSWORD=${{secrets.RABBITMQ_PASSWORD}}
           EOL
 
       - name: Sync files to VPS using rsync
@@ -79,11 +81,13 @@ jobs:
           FILES=(
             "db"
             "scripts/deploy.sh"
+            "scripts/generate_definitions.sh"
+            "rabbitmq_definitions.template.json"
             "docker-compose.yml"
             "docker-compose.prod.yml"
             ".env"
           )
-          
+
           rsync -avz --progress --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
           "${FILES[@]}" \
@@ -114,4 +118,3 @@ jobs:
           script: |
             chmod +x ~/life-metrics-backend/deploy.sh
             ~/life-metrics-backend/deploy.sh
-

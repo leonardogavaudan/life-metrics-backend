@@ -16,9 +16,9 @@ for var in "${REQUIRED_VARS[@]}"; do
 done
 
 echo "Loading environment variables from .env"
-set -o allexport
+set -a
 source ~/life-metrics-backend/.env
-set +o allexport
+set +a
 
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose unzip curl
@@ -60,6 +60,9 @@ function setup_aws {
   aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
 }
 setup_aws
+
+chmod +x ~/life-metrics-backend/generate_definitions.sh
+~/life-metrics-backend/generate_definitions.sh
 
 mkdir -p ~/life-metrics-backend/postgres_data
 cd ~/life-metrics-backend/
