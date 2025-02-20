@@ -1,6 +1,7 @@
 import { SQL } from "bun";
 
 const db = SQL({
+  url: `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DB}`,
   host: process.env.POSTGRES_HOST || "localhost",
   port: Number(process.env.POSTGRES_PORT) || 5432,
   database: process.env.POSTGRES_DB,
