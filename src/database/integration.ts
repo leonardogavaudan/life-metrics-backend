@@ -8,6 +8,7 @@ import {
 export async function getIntegrations(): Promise<Integration[]> {
   return await sql`
     SELECT * FROM integrations
+    WHERE deleted_on IS NULL
   `;
 }
 
@@ -17,6 +18,7 @@ export async function getIntegrationsByUserId(
   return await sql`
     SELECT * FROM integrations
     WHERE user_id = ${userId}
+    AND deleted_on IS NULL
   `;
 }
 
@@ -27,6 +29,7 @@ export async function getIntegrationByUserIdAndProvider(
   const results = await sql`
     SELECT * FROM integrations
     WHERE user_id = ${userId} AND provider = ${provider}
+    AND deleted_on IS NULL
     LIMIT 1
   `;
   return results[0] || null;
