@@ -192,5 +192,5 @@ integrationsRouter.post("/oauth/callback", async (c) => {
 integrationsRouter.delete("/:id", async (c) => {
   const id = c.req.param("id");
   await softDeleteIntegrationById(id);
-  return c.status(204);
+  return c.body(null, 204);
 });
