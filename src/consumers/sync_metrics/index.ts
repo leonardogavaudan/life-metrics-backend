@@ -17,8 +17,8 @@ export async function startSyncMetricsConsumer(): Promise<void> {
 
   await consumeFromQueue(Queue.SyncMetrics, async (msg) => {
     try {
-      console.log(`Message: ${msg}`);
-      console.log(`Message content: ${msg.content.toString()}`);
+      console.log("Message:", msg);
+      console.log("Message content", msg.content.toString());
       const payload = JSON.parse(
         msg.content.toString(),
       ) as SyncMetricsMessagePayload;
