@@ -20,7 +20,7 @@ function createConnection(): SQL {
     idleTimeout: 30,
     maxLifetime: 0,
     connectionTimeout: 30,
-    tls: process.env.IS_LOCAL !== "true",
+    tls: false,
     onconnect: () => console.log("Connected to database"),
     onclose: () => console.log("Connection closed"),
   });
