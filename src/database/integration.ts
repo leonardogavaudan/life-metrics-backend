@@ -1,4 +1,4 @@
-import { sql } from "bun";
+import { sql } from "./connection";
 import {
   CredentialsForProvider,
   Integration,
@@ -12,7 +12,7 @@ export async function getIntegrations(): Promise<Integration[]> {
 }
 
 export async function getIntegrationsByUserId(
-  userId: string,
+  userId: string
 ): Promise<Integration[]> {
   return await sql`
     SELECT * FROM integrations
@@ -22,7 +22,7 @@ export async function getIntegrationsByUserId(
 
 export async function getIntegrationByUserIdAndProvider(
   userId: string,
-  provider: IntegrationProvider,
+  provider: IntegrationProvider
 ): Promise<Integration | null> {
   const results = await sql`
     SELECT * FROM integrations
@@ -35,7 +35,7 @@ export async function getIntegrationByUserIdAndProvider(
 export async function upsertIntegration(
   userId: string,
   provider: IntegrationProvider,
-  credentials: Integration["credentials"],
+  credentials: Integration["credentials"]
 ): Promise<Integration> {
   const [integration] = await sql`
     INSERT INTO integrations (user_id, provider, credentials)
@@ -51,7 +51,7 @@ export async function upsertIntegration(
 
 export async function deleteIntegration(
   userId: string,
-  provider: IntegrationProvider,
+  provider: IntegrationProvider
 ): Promise<void> {
   await sql`
     DELETE FROM integrations
@@ -60,7 +60,7 @@ export async function deleteIntegration(
 }
 
 export async function updateIntegrationCredentials<
-  P extends IntegrationProvider,
+  P extends IntegrationProvider
 >(id: string, credentials: CredentialsForProvider<P>): Promise<void> {
   await sql`
      UPDATE integrations
