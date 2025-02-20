@@ -14,12 +14,12 @@ async function handleSyncMetricsMessagePayload({
   );
 
   const client = await getOuraClient(userId);
-  const response = await client.get("/usercollection/daily_sleep", {
-    params: {
-      start_date: new Date(startTime).toISOString().split("T")[0],
-      end_date: new Date(endTime).toISOString().split("T")[0],
-    },
-  });
+  // const response = await client.get("/usercollection/daily_sleep", {
+  //   params: {
+  //     start_date: new Date(startTime).toISOString().split("T")[0],
+  //     end_date: new Date(endTime).toISOString().split("T")[0],
+  //   },
+  // });
 }
 
 export async function startSyncMetricsConsumer(): Promise<void> {
