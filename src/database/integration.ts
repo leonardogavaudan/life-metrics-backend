@@ -1,5 +1,5 @@
 import { sql } from "./connection";
-import { Integration, IntegrationProvider } from "./integration/types";
+import { CredentialsForProvider, Integration } from "./integration/types";
 
 export async function getIntegrations(): Promise<Integration[]> {
   return await sql<Integration[]>`
@@ -8,17 +8,17 @@ export async function getIntegrations(): Promise<Integration[]> {
 }
 
 export async function getIntegrationsByUserId(
-  userId: string
+  userId: string,
 ): Promise<Integration[]> {
   return await sql<Integration[]>`
-    SELECT * FROM integrations 
+    SELECT * FROM integrations
     WHERE user_id = ${userId}
   `;
 }
 
 export async function getIntegrationByUserIdAndProvider(
   userId: string,
-  provider: IntegrationProvider
+  provider: IntegrationProvider,
 ): Promise<Integration | null> {
   const results = await sql<Integration[]>`
     SELECT * FROM integrations
@@ -31,7 +31,7 @@ export async function getIntegrationByUserIdAndProvider(
 export async function upsertIntegration(
   userId: string,
   provider: IntegrationProvider,
-  credentials: Integration["credentials"]
+  credentials: Integration["credentials"],
 ): Promise<Integration> {
   const [integration] = await sql<Integration[]>`
     INSERT INTO integrations (user_id, provider, credentials)
@@ -47,7 +47,7 @@ export async function upsertIntegration(
 
 export async function deleteIntegration(
   userId: string,
-  provider: IntegrationProvider
+  provider: IntegrationProvider,
 ): Promise<void> {
   await sql`
     DELETE FROM integrations
@@ -55,13 +55,12 @@ export async function deleteIntegration(
   `;
 }
 
-export async function updateIntegrationCredentials(
-  id: string,
-  credentials: Integration["credentials"]
-) {
+export async function updateIntegrationCredentials<
+  P extends IntegrationProvider,
+>(id: string, credentials: CredentialsForProvider<P>): Promise<void> {
   await sql`
-    UPDATE integrations
-    SET credentials = ${sql.json(credentials)}
-    WHERE id = ${id}
-  `;
+     UPDATE integrations
+     SET credentials = ${sql.json(credentials)}
+     WHERE id = ${id}
+    `;
 }

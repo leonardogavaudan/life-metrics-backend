@@ -11,40 +11,40 @@ import {
   OAuthState,
   OAuthTokenResponse,
 } from "./types";
-import { IntegrationProvider } from "../../database/integration/types";
+import { IntegrationProvider_ } from "../../database/integration/types";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,
   { name: string; description: string; status: IntegrationStatus }
 > = {
-  [IntegrationProvider.Whoop]: {
+  [IntegrationProvider_.Whoop]: {
     name: "Whoop",
     description:
       "Track your strain, recovery, and sleep with Whoop integration",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider.Fitbit]: {
+  [IntegrationProvider_.Fitbit]: {
     name: "Fitbit",
     description: "Sync your Fitbit data to track steps, sleep, and activity",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider.Oura]: {
+  [IntegrationProvider_.Oura]: {
     name: "Oura Ring",
     description: "Import your sleep and recovery data from Oura Ring",
     status: IntegrationStatus.Available,
   },
-  [IntegrationProvider.AppleHealth]: {
+  [IntegrationProvider_.AppleHealth]: {
     name: "Apple Health",
     description:
       "Sync your Apple Health data for comprehensive health tracking",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider.Garmin]: {
+  [IntegrationProvider_.Garmin]: {
     name: "Garmin",
     description: "Connect your Garmin device to track your fitness activities",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider.Coros]: {
+  [IntegrationProvider_.Coros]: {
     name: "COROS",
     description: "Track your training and performance with COROS integration",
     status: IntegrationStatus.ComingSoon,
@@ -73,28 +73,28 @@ integrationsRouter.get("/", async (c) => {
   const connectedIntegrations = await getIntegrationsByUserId(user.id);
 
   const connectedProviders = new Set(
-    connectedIntegrations.map((i) => i.provider)
+    connectedIntegrations.map((i) => i.provider),
   );
 
-  const transformedConnectedIntegrations =
-    connectedIntegrations.map((integration) => ({
+  const transformedConnectedIntegrations = connectedIntegrations.map(
+    (integration) => ({
       id: integration.id,
       provider: integration.provider,
       name: INTEGRATION_DETAILS[integration.provider].name,
       description: INTEGRATION_DETAILS[integration.provider].description,
       status: IntegrationStatus.Connected,
-    }));
+    }),
+  );
 
-  const availableIntegrations =
-    Object.values(IntegrationProvider)
-      .filter((provider) => !connectedProviders.has(provider))
-      .map((provider) => ({
-        id: null,
-        provider,
-        name: INTEGRATION_DETAILS[provider].name,
-        description: INTEGRATION_DETAILS[provider].description,
-        status: INTEGRATION_DETAILS[provider].status,
-      }));
+  const availableIntegrations = Object.values(IntegrationProvider_)
+    .filter((provider) => !connectedProviders.has(provider))
+    .map((provider) => ({
+      id: null,
+      provider,
+      name: INTEGRATION_DETAILS[provider].name,
+      description: INTEGRATION_DETAILS[provider].description,
+      status: INTEGRATION_DETAILS[provider].status,
+    }));
 
   return c.json({
     integrations: [
@@ -139,7 +139,7 @@ integrationsRouter.post("/oauth/callback", async (c) => {
 
   try {
     const state: OAuthState = JSON.parse(
-      Buffer.from(encodedState, "base64").toString()
+      Buffer.from(encodedState, "base64").toString(),
     );
 
     if (Date.now() - state.timestamp > 10 * 60 * 1000) {
@@ -162,10 +162,10 @@ integrationsRouter.post("/oauth/callback", async (c) => {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: `Basic ${Buffer.from(
-            `${config.clientId}:${config.clientSecret}`
+            `${config.clientId}:${config.clientSecret}`,
           ).toString("base64")}`,
         },
-      }
+      },
     );
 
     const credentials = {
