@@ -1,4 +1,7 @@
-import { IntegrationProvider_ } from "../../database/integration/types";
+import {
+  IntegrationProviders,
+  IntegrationProvider,
+} from "../../database/integration/types";
 
 export enum IntegrationStatus {
   Available = "available",
@@ -39,7 +42,7 @@ export interface OAuthTokenResponse {
 
 export const OAUTH_CONFIGS: Partial<Record<IntegrationProvider, OAuthConfig>> =
   {
-    [IntegrationProvider_.Oura]: {
+    [IntegrationProviders.Oura]: {
       authUrl: "https://cloud.ouraring.com/oauth/authorize",
       tokenUrl: "https://api.ouraring.com/oauth/token",
       clientId: process.env.OURA_CLIENT_ID!,

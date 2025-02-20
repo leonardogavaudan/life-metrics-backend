@@ -11,40 +11,43 @@ import {
   OAuthState,
   OAuthTokenResponse,
 } from "./types";
-import { IntegrationProvider_ } from "../../database/integration/types";
+import {
+  IntegrationProvider,
+  IntegrationProviders,
+} from "../../database/integration/types";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,
   { name: string; description: string; status: IntegrationStatus }
 > = {
-  [IntegrationProvider_.Whoop]: {
+  [IntegrationProviders.Whoop]: {
     name: "Whoop",
     description:
       "Track your strain, recovery, and sleep with Whoop integration",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider_.Fitbit]: {
+  [IntegrationProviders.Fitbit]: {
     name: "Fitbit",
     description: "Sync your Fitbit data to track steps, sleep, and activity",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider_.Oura]: {
+  [IntegrationProviders.Oura]: {
     name: "Oura Ring",
     description: "Import your sleep and recovery data from Oura Ring",
     status: IntegrationStatus.Available,
   },
-  [IntegrationProvider_.AppleHealth]: {
+  [IntegrationProviders.AppleHealth]: {
     name: "Apple Health",
     description:
       "Sync your Apple Health data for comprehensive health tracking",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider_.Garmin]: {
+  [IntegrationProviders.Garmin]: {
     name: "Garmin",
     description: "Connect your Garmin device to track your fitness activities",
     status: IntegrationStatus.ComingSoon,
   },
-  [IntegrationProvider_.Coros]: {
+  [IntegrationProviders.Coros]: {
     name: "COROS",
     description: "Track your training and performance with COROS integration",
     status: IntegrationStatus.ComingSoon,
@@ -86,7 +89,7 @@ integrationsRouter.get("/", async (c) => {
     }),
   );
 
-  const availableIntegrations = Object.values(IntegrationProvider_)
+  const availableIntegrations = Object.values(IntegrationProviders)
     .filter((provider) => !connectedProviders.has(provider))
     .map((provider) => ({
       id: null,
