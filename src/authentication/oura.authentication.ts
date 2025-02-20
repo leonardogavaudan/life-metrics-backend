@@ -23,20 +23,21 @@ export async function getOuraClient(userId: string): Promise<AxiosInstance> {
   });
   const integration = await getIntegrationByUserIdAndProvider(
     userId,
-    IntegrationProviders.Oura,
+    IntegrationProviders.Oura
   );
   if (!integration) throw new Error("Integration not found");
   const parsed = OAuthCredentials.safeParse(integration.credentials);
   if (!parsed.success) throw new Error("Invalid credentials");
-  ouraClient.defaults.headers.common["Authorization"] =
-    `Bearer ${parsed.data.access_token}`;
+  ouraClient.defaults.headers.common[
+    "Authorization"
+  ] = `Bearer ${parsed.data.access_token}`;
 
   ouraClient.interceptors.response.use(undefined, async (error: AxiosError) => {
     if (!error.response) throw error;
     if (error.response.status === 401) {
       const config = error.config;
       if (!config) throw new Error("No config found");
-      const newAccessToken = await refreshTokens(ouraClient, userId);
+      const newAccessToken = await refreshTokens(userId);
       config.headers.set("Authorization", `Bearer ${newAccessToken}`);
       return ouraClient.request(config);
     }
@@ -53,41 +54,41 @@ type OuraPostOAuthTokenResponse = {
   refresh_token: string;
 };
 
-async function refreshTokens(
-  ouraClient: AxiosInstance,
-  userId: string,
-): Promise<string> {
+async function refreshTokens(userId: string): Promise<string> {
   const integration = await getIntegrationByUserIdAndProvider(
     userId,
-    IntegrationProviders.Oura,
+    IntegrationProviders.Oura
   );
   if (!integration) throw new Error("Integration not found");
 
   const parsed = OAuthCredentials.safeParse(integration.credentials);
   if (!parsed.success) throw new Error("Invalid credentials");
 
-  const response = await ouraClient.post<OuraPostOAuthTokenResponse>(
-    "/oauth/token",
-    {
+  const response = await axios.post<OuraPostOAuthTokenResponse>(
+    "https://api.ouraring.com/oauth/token",
+    new URLSearchParams({
       grant_type: "refresh_token",
       refresh_token: parsed.data.refresh_token,
-      client_id: OURA_CLIENT_ID,
-      client_secret: OURA_CLIENT_SECRET,
-    },
+      client_id: OURA_CLIENT_ID!,
+      client_secret: OURA_CLIENT_SECRET!,
+    }).toString(),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
   );
-
   const newCreds = {
     access_token: response.data.access_token,
     refresh_token: response.data.refresh_token,
     expires_at: new Date(
-      Date.now() + response.data.expires_in * 1000,
+      Date.now() + response.data.expires_in * 1000
     ).toISOString(),
     token_type: response.data.token_type,
   };
   await updateIntegrationCredentials<typeof IntegrationProviders.Oura>(
     integration.id,
-    newCreds,
+    newCreds
   );
-
   return response.data.access_token;
 }

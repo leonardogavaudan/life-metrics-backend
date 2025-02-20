@@ -21,8 +21,6 @@ function createConnection(): SQL {
     maxLifetime: 0,
     connectionTimeout: 30,
     tls: false,
-    onconnect: () => console.log("Connected to database"),
-    onclose: () => console.log("Connection closed"),
   });
 }
 
