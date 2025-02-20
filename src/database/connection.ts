@@ -1,4 +1,4 @@
-import { sql, SQL } from "bun";
+import { SQL } from "bun";
 
 if (
   !process.env.POSTGRES_USER ||
@@ -6,44 +6,31 @@ if (
   !process.env.POSTGRES_HOST ||
   !process.env.POSTGRES_DB
 ) {
-  throw new Error("Missing var env");
+  throw new Error("Missing required environment variables");
 }
 
-const db = SQL({
-  url: `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DB}`,
-  host: process.env.POSTGRES_HOST || "localhost",
-  port: Number(process.env.POSTGRES_PORT) || 5432,
-  database: process.env.POSTGRES_DB,
-  username: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
+let sqlInstance: SQL | null = null;
 
-  // Connection pool settings
-  max: 20, // Maximum connections in pool
-  idleTimeout: 30, // Close idle connections after 30s
-  maxLifetime: 0, // Connection lifetime in seconds (0 = forever)
-  connectionTimeout: 30, // Timeout when establishing new connections
+function createConnection(): SQL {
+  const connectionUrl = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DB}`;
+  // @ts-ignore
+  return new SQL({
+    url: connectionUrl,
+    max: 20,
+    idleTimeout: 30,
+    maxLifetime: 0,
+    connectionTimeout: 30,
+    tls: process.env.IS_LOCAL !== "true",
+    onconnect: () => console.log("Connected to database"),
+    onclose: () => console.log("Connection closed"),
+  });
+}
 
-  // SSL/TLS options
-  tls: true,
-  // tls: {
-  //   rejectUnauthorized: true,
-  //   requestCert: true,
-  //   ca: "path/to/ca.pem",
-  //   key: "path/to/key.pem",
-  //   cert: "path/to/cert.pem",
-  //   checkServerIdentity(hostname, cert) {
-  //     ...
-  //   },
-  // },
+function getConnection(): SQL {
+  if (!sqlInstance) {
+    sqlInstance = createConnection();
+  }
+  return sqlInstance;
+}
 
-  onconnect: (_: any) => {
-    console.log("Connected to database");
-  },
-  onclose: (_: any) => {
-    console.log("Connection closed");
-  },
-});
-
-console.log(process.env);
-
-console.log(await sql`SELECT * FROM users`);
+export const db = getConnection();
