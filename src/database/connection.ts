@@ -33,4 +33,4 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-export const db = getConnection();
+export const sql = getConnection();
