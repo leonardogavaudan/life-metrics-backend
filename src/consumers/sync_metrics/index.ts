@@ -8,7 +8,7 @@ async function handleSyncMetricsMessagePayload({
   endTime,
 }: SyncMetricsMessagePayload): Promise<void> {
   console.log(
-    `Starting sync for integration ${integrationId} from ${startTime} to ${endTime}`
+    `Starting sync for integration ${integrationId} from ${startTime} to ${endTime}`,
   );
 }
 
@@ -17,9 +17,10 @@ export async function startSyncMetricsConsumer(): Promise<void> {
 
   await consumeFromQueue(Queue.SyncMetrics, async (msg) => {
     try {
-      console.log(`Received message: ${msg.content.toString()}`);
+      console.log(`Message: ${msg}`);
+      console.log(`Message content: ${msg.content.toString()}`);
       const payload = JSON.parse(
-        msg.content.toString()
+        msg.content.toString(),
       ) as SyncMetricsMessagePayload;
       await handleSyncMetricsMessagePayload(payload);
     } catch (error) {
