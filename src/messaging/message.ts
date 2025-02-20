@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { Queue } from "./queue";
+import { IntegrationProvider } from "../database/integration/types";
 
 export function createMessage<T>(queue: Queue, payload: T): Message {
   return {
@@ -28,7 +29,8 @@ export type Message = {
 };
 
 export type SyncMetricsMessagePayload = {
-  integrationId: string;
+  userId: string;
+  provider: IntegrationProvider;
   startTime: string;
   endTime: string;
 };

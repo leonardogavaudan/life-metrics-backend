@@ -9,7 +9,8 @@ export function setupCronJobs(): void {
     const integrations = await getIntegrations();
     const messages = integrations.map((integration) => {
       return createMessage<SyncMetricsMessagePayload>(Queue.SyncMetrics, {
-        integrationId: integration.id,
+        userId: integration.user_id,
+        provider: integration.provider,
         startTime: new Date().toISOString(),
         endTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
       });

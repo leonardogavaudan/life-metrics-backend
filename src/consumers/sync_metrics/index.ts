@@ -1,15 +1,19 @@
+import { getOuraClient } from "../../authentication/oura.authentication";
 import { consumeFromQueue } from "../../messaging";
 import { SyncMetricsMessagePayload } from "../../messaging/message";
 import { Queue } from "../../messaging/queue";
 
 async function handleSyncMetricsMessagePayload({
-  integrationId,
+  userId,
+  provider,
   startTime,
   endTime,
 }: SyncMetricsMessagePayload): Promise<void> {
   console.log(
-    `Starting sync for integration ${integrationId} from ${startTime} to ${endTime}`,
+    `Starting sync for user ${userId} for the provider ${provider} from ${startTime} to ${endTime}`,
   );
+
+  const client = getOuraClient(userId);
 }
 
 export async function startSyncMetricsConsumer(): Promise<void> {

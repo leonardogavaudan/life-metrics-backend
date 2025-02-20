@@ -1,4 +1,4 @@
-import { sql } from "./connection";
+import { sql } from "bun";
 
 export interface User {
   id: string;
@@ -18,7 +18,7 @@ export type CreateUser = Omit<
 };
 
 export async function getUserById(id: string): Promise<User | null> {
-  const [user] = await sql<User[]>`
+  const [user] = await sql`
     SELECT * FROM users WHERE id = ${id}
   `;
 
@@ -26,7 +26,7 @@ export async function getUserById(id: string): Promise<User | null> {
 }
 
 export async function upsertUser(user: CreateUser): Promise<User> {
-  const [newUser] = await sql<User[]>`
+  const [newUser] = await sql`
     INSERT INTO users (
       email,
       google_id,
