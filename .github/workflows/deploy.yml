@@ -23,10 +23,27 @@ env:
   OURA_CLIENT_SECRET: ${{ secrets.OURA_CLIENT_SECRET }}
 
 jobs:
-  build_and_push:
+  type_check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run type check
+        run: bun run tsc --noEmit
+
+  build_and_push:
+    needs: [type_check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -45,12 +62,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   sync_files:
+    needs: [type_check]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: shimataro/ssh-key-action@v4
         with:
           key: ${{ secrets.VPS_SSH_KEY }}
           known_hosts: unnecessary
@@ -98,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: shimataro/ssh-key-action@v4
         with:
           key: ${{ secrets.VPS_SSH_KEY }}
           known_hosts: unnecessary
