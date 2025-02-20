@@ -44,27 +44,26 @@ export async function upsertIntegration(
     DO UPDATE SET
       credentials = ${credentials}::json,
       updated_at = CURRENT_TIMESTAMP
+      deleted_on = NULL 
     RETURNING *
   `;
   return integration;
-}
-
-export async function deleteIntegration(
-  userId: string,
-  provider: IntegrationProvider
-): Promise<void> {
-  await sql`
-    DELETE FROM integrations
-    WHERE user_id = ${userId} AND provider = ${provider}
-  `;
 }
 
 export async function updateIntegrationCredentials<
   P extends IntegrationProvider
 >(id: string, credentials: CredentialsForProvider<P>): Promise<void> {
   await sql`
-     UPDATE integrations
-     SET credentials = ${credentials}::json
-     WHERE id = ${id}
-    `;
+    UPDATE integrations
+    SET credentials = ${credentials}::json
+    WHERE id = ${id}
+  `;
+}
+
+export async function softDeleteIntegrationById(id: string): Promise<void> {
+  await sql`
+    UPDATE integrations
+    SET deleted_on = CURRENT_TIMESTAMP
+    WHERE id = ${id}
+  `;
 }

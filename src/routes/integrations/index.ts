@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 import { jwtValidationMiddleware, JwtPayload } from "../../middleware/jwt";
 import axios from "axios";
 import {
+  softDeleteIntegrationById,
   getIntegrationsByUserId,
   upsertIntegration,
 } from "../../database/integration";
@@ -76,7 +77,7 @@ integrationsRouter.get("/", async (c) => {
   const connectedIntegrations = await getIntegrationsByUserId(user.id);
 
   const connectedProviders = new Set(
-    connectedIntegrations.map((i) => i.provider),
+    connectedIntegrations.map((i) => i.provider)
   );
 
   const transformedConnectedIntegrations = connectedIntegrations.map(
@@ -86,7 +87,7 @@ integrationsRouter.get("/", async (c) => {
       name: INTEGRATION_DETAILS[integration.provider].name,
       description: INTEGRATION_DETAILS[integration.provider].description,
       status: IntegrationStatus.Connected,
-    }),
+    })
   );
 
   const availableIntegrations = Object.values(IntegrationProviders)
@@ -142,7 +143,7 @@ integrationsRouter.post("/oauth/callback", async (c) => {
 
   try {
     const state: OAuthState = JSON.parse(
-      Buffer.from(encodedState, "base64").toString(),
+      Buffer.from(encodedState, "base64").toString()
     );
 
     if (Date.now() - state.timestamp > 10 * 60 * 1000) {
@@ -165,10 +166,10 @@ integrationsRouter.post("/oauth/callback", async (c) => {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: `Basic ${Buffer.from(
-            `${config.clientId}:${config.clientSecret}`,
+            `${config.clientId}:${config.clientSecret}`
           ).toString("base64")}`,
         },
-      },
+      }
     );
 
     const credentials = {
@@ -186,4 +187,10 @@ integrationsRouter.post("/oauth/callback", async (c) => {
     console.error("OAuth callback error:", error);
     return c.json({ error: "Failed to complete OAuth flow" }, 500);
   }
+});
+
+integrationsRouter.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  await softDeleteIntegrationById(id);
+  return c.status(204);
 });
