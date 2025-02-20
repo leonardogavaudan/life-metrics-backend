@@ -1,4 +1,13 @@
-import { SQL } from "bun";
+import { sql, SQL } from "bun";
+
+if (
+  !process.env.POSTGRES_USER ||
+  !process.env.POSTGRES_PASSWORD ||
+  !process.env.POSTGRES_HOST ||
+  !process.env.POSTGRES_DB
+) {
+  throw new Error("Missing var env");
+}
 
 const db = SQL({
   url: `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:5432/${process.env.POSTGRES_DB}`,
@@ -34,3 +43,7 @@ const db = SQL({
     console.log("Connection closed");
   },
 });
+
+console.log(process.env);
+
+console.log(await sql`SELECT * FROM users`);
