@@ -19,7 +19,7 @@ export async function getConnection(): Promise<Connection> {
   isConnecting = true;
   try {
     connection = await connect(
-      `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASSWORD}@rabbitmq`
+      `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASSWORD}@rabbitmq`,
     );
     connection.on("error", (err) => {
       console.error("RabbitMQ connection error:", err);
@@ -42,17 +42,13 @@ export async function getConnection(): Promise<Connection> {
 
 export async function sendMessagesToQueue(
   queue: Queue,
-  messages: Message[]
+  messages: Message[],
 ): Promise<void> {
   console.log(`Sending ${messages.length} messages to queue ${queue}`);
   const conn = await getConnection();
   const channel = await conn.createConfirmChannel();
   for (const message of messages) {
-    channel.sendToQueue(
-      queue,
-      Buffer.from(JSON.stringify(message.content)),
-      message.properties
-    );
+    channel.sendToQueue(queue, message.content, message.properties);
   }
   await channel.waitForConfirms();
   await channel.close();
@@ -62,7 +58,7 @@ export type MessageHandler = (msg: ConsumeMessage) => Promise<void>;
 
 export async function consumeFromQueue(
   queue: Queue,
-  handler: MessageHandler
+  handler: MessageHandler,
 ): Promise<void> {
   const conn = await getConnection();
   const channel = await conn.createChannel();
