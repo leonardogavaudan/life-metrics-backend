@@ -46,7 +46,7 @@ export async function upsertIntegration(
     ON CONFLICT (user_id, provider)
     DO UPDATE SET
       credentials = ${credentials}::json,
-      updated_at = CURRENT_TIMESTAMP
+      updated_at = CURRENT_TIMESTAMP,
       deleted_on = NULL 
     RETURNING *
   `;
