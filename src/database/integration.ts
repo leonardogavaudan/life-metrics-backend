@@ -39,10 +39,10 @@ export async function upsertIntegration(
 ): Promise<Integration> {
   const [integration] = await sql`
     INSERT INTO integrations (user_id, provider, credentials)
-    VALUES (${userId}, ${provider}, ${sql.json(credentials)})
+    VALUES (${userId}, ${provider}, ${credentials}::json)
     ON CONFLICT (user_id, provider)
     DO UPDATE SET
-      credentials = ${sql.json(credentials)},
+      credentials = ${credentials}::json,
       updated_at = CURRENT_TIMESTAMP
     RETURNING *
   `;
