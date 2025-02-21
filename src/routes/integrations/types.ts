@@ -1,7 +1,5 @@
-import {
-  IntegrationProviders,
-  IntegrationProvider,
-} from "../../database/integration/types";
+import { IntegrationProvider } from "../../types/types.provider";
+import { IntegrationProviders } from "../../types/types.provider";
 
 export enum IntegrationStatus {
   Available = "available",

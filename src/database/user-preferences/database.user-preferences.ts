@@ -21,5 +21,18 @@ export async function getUserPreferencesWithIntegrationsByUserId(
       ON integrations.id = user_preferences.preferred_integration_id
     WHERE user_preferences.user_id = ${userId}
     AND integrations.deleted_on IS NULL
+    AND user_preferences.deleted_on IS NULL
+  `;
+}
+
+export async function softDeleteUserPreferenceByUserIdAndMetricType(
+  userId: string,
+  metricType: string
+): Promise<void> {
+  await sql`
+    UPDATE user_preferences
+    SET deleted_on = CURRENT_TIMESTAMP
+    WHERE user_id = ${userId}
+    AND metric_type = ${metricType}
   `;
 }

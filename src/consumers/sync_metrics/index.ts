@@ -12,7 +12,7 @@ import {
 import { consumeFromQueue } from "../../messaging";
 import { SyncMetricsMessagePayload } from "../../messaging/message";
 import { Queue } from "../../messaging/queue";
-import { MetricType, Unit } from "../../types/types.metrics";
+import { MetricTypes, Units } from "../../types/types.metrics";
 
 async function handleSyncMetricsMessagePayload({
   userId,
@@ -41,9 +41,9 @@ async function handleSyncMetricsMessagePayload({
   await upsertIntegrationDailyMetric({
     resolved_daily_metric_id: resolvedDailyMetric.id,
     integration_id: userId,
-    metric_type: MetricType.DailySleepScore,
+    metric_type: MetricTypes.DailySleepScore,
     value: score,
-    unit: Unit.Points,
+    unit: Units.Points,
     event_date: day,
   });
 }
@@ -64,9 +64,9 @@ async function upsertResolvedDailyMetric(
   return await createResolvedDailyMetric({
     user_id: userId,
     event_date: day,
-    metric_type: MetricType.DailySleepScore,
+    metric_type: MetricTypes.DailySleepScore,
     value: score,
-    unit: Unit.Points,
+    unit: Units.Points,
     integration_priority: {},
   });
 }

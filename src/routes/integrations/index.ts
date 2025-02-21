@@ -12,10 +12,8 @@ import {
   OAuthState,
   OAuthTokenResponse,
 } from "./types";
-import {
-  IntegrationProvider,
-  IntegrationProviders,
-} from "../../database/integration/types";
+import { IntegrationProvider } from "../../types/types.provider";
+import { IntegrationProviders } from "../../types/types.provider";
 
 const INTEGRATION_DETAILS: Record<
   IntegrationProvider,

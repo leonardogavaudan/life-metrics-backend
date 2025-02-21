@@ -1,15 +1,8 @@
 import { z } from "zod";
-
-export const IntegrationProviders = {
-  Whoop: "whoop",
-  Fitbit: "fitbit",
-  Oura: "oura",
-  AppleHealth: "apple_health",
-  Garmin: "garmin",
-  Coros: "coros",
-} as const;
-export type IntegrationProvider =
-  (typeof IntegrationProviders)[keyof typeof IntegrationProviders];
+import {
+  IntegrationProvider,
+  IntegrationProviders,
+} from "../../types/types.provider";
 
 export const OAuthCredentials = z.object({
   token_type: z.string(),
@@ -36,8 +29,9 @@ export interface Integration {
   user_id: string;
   provider: IntegrationProvider;
   credentials: IntegrationCredentials[IntegrationProvider];
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
+  deleted_on: string | null;
 }
 
 export type CredentialsForProvider<P extends IntegrationProvider> =
