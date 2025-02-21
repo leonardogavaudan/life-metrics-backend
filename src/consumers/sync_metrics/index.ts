@@ -1,7 +1,18 @@
+import { getDailySleep } from "../../api/oura";
 import { getOuraClient } from "../../authentication/oura.authentication";
+import {
+  createIntegrationDailyMetric,
+  upsertIntegrationDailyMetric,
+} from "../../database/integration_daily_metric/database.integration-daily-metric";
+import {
+  createResolvedDailyMetric,
+  getResolvedDailyMetricByDateAndUserId,
+  ResolvedDailyMetric,
+} from "../../database/resolved_daily_metric/database.resolved-daily-metric";
 import { consumeFromQueue } from "../../messaging";
 import { SyncMetricsMessagePayload } from "../../messaging/message";
 import { Queue } from "../../messaging/queue";
+import { MetricType, Unit } from "../../types/types.metrics";
 
 async function handleSyncMetricsMessagePayload({
   userId,
@@ -14,12 +25,50 @@ async function handleSyncMetricsMessagePayload({
   );
 
   const client = await getOuraClient(userId);
-  // const response = await client.get("/usercollection/daily_sleep", {
-  //   params: {
-  //     start_date: new Date(startTime).toISOString().split("T")[0],
-  //     end_date: new Date(endTime).toISOString().split("T")[0],
-  //   },
-  // });
+  const response = await getDailySleep(
+    client,
+    new Date(startTime),
+    new Date(endTime)
+  );
+  const { day, score } = response.data.data;
+
+  const resolvedDailyMetric = await upsertResolvedDailyMetric(
+    userId,
+    day,
+    score
+  );
+
+  await upsertIntegrationDailyMetric({
+    resolved_daily_metric_id: resolvedDailyMetric.id,
+    integration_id: userId,
+    metric_type: MetricType.DailySleepScore,
+    value: score,
+    unit: Unit.Points,
+    event_date: day,
+  });
+}
+
+async function upsertResolvedDailyMetric(
+  userId: string,
+  day: string,
+  score: number
+): Promise<ResolvedDailyMetric> {
+  const resolvedDailyMetric = await getResolvedDailyMetricByDateAndUserId(
+    userId,
+    new Date(day)
+  );
+  if (resolvedDailyMetric) {
+    return resolvedDailyMetric;
+  }
+
+  return await createResolvedDailyMetric({
+    user_id: userId,
+    event_date: day,
+    metric_type: MetricType.DailySleepScore,
+    value: score,
+    unit: Unit.Points,
+    integration_priority: {},
+  });
 }
 
 export async function startSyncMetricsConsumer(): Promise<void> {
@@ -53,3 +102,4 @@ export async function startSyncMetricsConsumer(): Promise<void> {
 // });
 
 // console.log(response.data);
+// console.log(response.data.data);
