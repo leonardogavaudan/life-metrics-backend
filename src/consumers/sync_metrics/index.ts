@@ -1,5 +1,6 @@
 import { getDailySleep } from "../../api/oura";
 import { getOuraClient } from "../../authentication/oura.authentication";
+import { getIntegrationByUserIdAndProvider } from "../../database/integration";
 import { upsertIntegrationDailyMetric } from "../../database/integration_daily_metric/database.integration-daily-metric";
 import {
   createResolvedDailyMetric,
@@ -36,9 +37,12 @@ async function handleSyncMetricsMessagePayload({
     score
   );
 
+  const integration = await getIntegrationByUserIdAndProvider(userId, provider);
+  if (!integration) throw new Error("Integration not found");
+
   await upsertIntegrationDailyMetric({
     resolved_daily_metric_id: resolvedDailyMetric.id,
-    integration_id: userId,
+    integration_id: integration.id,
     metric_type: MetricTypes.DailySleepScore,
     value: score,
     unit: Units.Points,
