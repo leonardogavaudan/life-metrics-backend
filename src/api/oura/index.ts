@@ -15,7 +15,7 @@ export interface OuraGetDailySleepResponse {
     day: string;
     score: number;
     timestamp: string;
-  };
+  }[];
   next_token: string | null;
 }
 

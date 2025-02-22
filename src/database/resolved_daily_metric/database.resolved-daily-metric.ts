@@ -21,7 +21,21 @@ export async function createResolvedDailyMetric(
   payload: CreateResolvedDailyMetricPayload
 ): Promise<ResolvedDailyMetric> {
   const [resolvedDailyMetric] = await sql`
-    INSERT INTO resolved_daily_metrics ${sql(payload)}
+    INSERT INTO resolved_daily_metrics (
+      user_id,
+      event_date,
+      metric_type,
+      value,
+      unit,
+      integration_priority
+    ) VALUES (
+      ${payload.user_id},
+      ${payload.event_date}::date,
+      ${payload.metric_type},
+      ${payload.value},
+      ${payload.unit},
+      ${payload.integration_priority}
+    )
     RETURNING *
   `;
   return resolvedDailyMetric;

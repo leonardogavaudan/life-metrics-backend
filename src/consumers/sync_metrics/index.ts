@@ -1,9 +1,6 @@
 import { getDailySleep } from "../../api/oura";
 import { getOuraClient } from "../../authentication/oura.authentication";
-import {
-  createIntegrationDailyMetric,
-  upsertIntegrationDailyMetric,
-} from "../../database/integration_daily_metric/database.integration-daily-metric";
+import { upsertIntegrationDailyMetric } from "../../database/integration_daily_metric/database.integration-daily-metric";
 import {
   createResolvedDailyMetric,
   getResolvedDailyMetricByDateAndUserId,
@@ -31,7 +28,7 @@ async function handleSyncMetricsMessagePayload({
     new Date(endTime)
   );
   console.log("response.data", response.data);
-  const { day, score } = response.data.data;
+  const { day, score } = response.data.data[0];
 
   const resolvedDailyMetric = await upsertResolvedDailyMetric(
     userId,
@@ -54,8 +51,6 @@ async function upsertResolvedDailyMetric(
   day: string,
   score: number
 ): Promise<ResolvedDailyMetric> {
-  console.log(`Upserting resolved daily metric for user ${userId} on ${day}`);
-  console.log(new Date(day).toISOString());
   const resolvedDailyMetric = await getResolvedDailyMetricByDateAndUserId(
     userId,
     new Date(day)
@@ -66,7 +61,7 @@ async function upsertResolvedDailyMetric(
 
   return await createResolvedDailyMetric({
     user_id: userId,
-    event_date: day,
+    event_date: new Date(day).toISOString().split("T")[0],
     metric_type: MetricTypes.DailySleepScore,
     value: score,
     unit: Units.Points,
@@ -94,15 +89,11 @@ export async function startSyncMetricsConsumer(): Promise<void> {
   console.log("Sync metrics consumer started successfully");
 }
 
-// const client = await getOuraClient("68dd1648-73d9-49ce-8034-1f8887f25a96");
-// const response = await client.get("/usercollection/daily_sleep", {
-//   params: {
-//     start_date: new Date("2025-02-20T15:20:00.130Z")
-//       .toISOString()
-//       .split("T")[0],
-//     end_date: new Date("2025-02-20T15:25:00.130Z").toISOString().split("T")[0],
-//   },
+// const startTime = "2025-02-20T15:20:00.130Z";
+// const endTime = "2025-02-20T15:25:00.130Z";
+// await handleSyncMetricsMessagePayload({
+//   userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
+//   provider: "oura",
+//   startTime,
+//   endTime,
 // });
-
-// console.log(response.data);
-// console.log(response.data.data);

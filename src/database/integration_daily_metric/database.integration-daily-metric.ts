@@ -21,7 +21,21 @@ export async function createIntegrationDailyMetric(
   payload: CreateIntegrationDailyMetricPayload
 ): Promise<IntegrationDailyMetric> {
   const [metric] = await sql`
-    INSERT INTO integration_daily_metrics ${sql(payload)} 
+    INSERT INTO integration_daily_metrics (
+      resolved_daily_metric_id,
+      integration_id,
+      metric_type,
+      value,
+      unit,
+      event_date
+    ) VALUES (
+      ${payload.resolved_daily_metric_id},
+      ${payload.integration_id},
+      ${payload.metric_type},
+      ${payload.value},
+      ${payload.unit},
+      ${payload.event_date}::date
+    )
     RETURNING *
   `;
   return metric;
@@ -31,11 +45,25 @@ export async function upsertIntegrationDailyMetric(
   payload: CreateIntegrationDailyMetricPayload
 ): Promise<IntegrationDailyMetric> {
   const [metric] = await sql`
-    INSERT INTO integration_daily_metrics ${sql(payload)} 
-    ON CONFLICT (resolved_daily_metric_id, integration_id, metric_type, event_date)
+    INSERT INTO integration_daily_metrics (
+      resolved_daily_metric_id,
+      integration_id,
+      metric_type,
+      value,
+      unit,
+      event_date
+    ) VALUES (
+      ${payload.resolved_daily_metric_id},
+      ${payload.integration_id},
+      ${payload.metric_type},
+      ${payload.value},
+      ${payload.unit},
+      ${payload.event_date}::date
+    )
+    ON CONFLICT (integration_id, metric_type, event_date)
     DO UPDATE SET
       value = EXCLUDED.value,
-      unit = EXCLUDED.unit,
+      unit = EXCLUDED.unit
     RETURNING *
   `;
   return metric;
