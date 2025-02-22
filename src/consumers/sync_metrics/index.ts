@@ -53,6 +53,8 @@ async function upsertResolvedDailyMetric(
   day: string,
   score: number
 ): Promise<ResolvedDailyMetric> {
+  console.log(`Upserting resolved daily metric for user ${userId} on ${day}`);
+  console.log(new Date(day).toISOString());
   const resolvedDailyMetric = await getResolvedDailyMetricByDateAndUserId(
     userId,
     new Date(day)
