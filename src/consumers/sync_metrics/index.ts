@@ -30,6 +30,7 @@ async function handleSyncMetricsMessagePayload({
     new Date(startTime),
     new Date(endTime)
   );
+  console.log("response.data", response.data);
   const { day, score } = response.data.data;
 
   const resolvedDailyMetric = await upsertResolvedDailyMetric(
