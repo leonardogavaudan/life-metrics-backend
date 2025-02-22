@@ -34,7 +34,7 @@ export async function getResolvedDailyMetricByDateAndUserId(
   const [resolvedDailyMetric] = await sql`
     SELECT * FROM resolved_daily_metrics
     WHERE user_id = ${userId}
-    AND event_date = ${date.toISOString()}
+    AND event_date = ${date.toISOString().split("T")[0]}
     LIMIT 1
   `;
   return resolvedDailyMetric || null;
