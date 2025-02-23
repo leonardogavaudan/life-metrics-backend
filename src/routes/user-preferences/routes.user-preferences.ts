@@ -15,6 +15,7 @@ import {
 } from "../../types/types.metrics";
 import { getIntegrationsByUserId } from "../../database/integration";
 import { IntegrationProvidersValidator } from "../../types/types.provider";
+import { getIntegrationByUserIdAndProvider } from "../../database/integration";
 
 export const userPreferencesRouter = new Hono();
 
@@ -82,8 +83,16 @@ userPreferencesRouter.put("/:metricType", jwtMiddleware, async (c) => {
     return c.json({ error: "Invalid provider" }, 400);
   }
 
+  const integration = await getIntegrationByUserIdAndProvider(
+    userId,
+    providerParsed.data
+  );
+  if (!integration) {
+    return c.json({ error: "Integration not found for provider" }, 404);
+  }
+
   await upsertUserPreferenceByUserIdAndMetricType(userId, metricType, {
-    preferred_integration_id: provider,
+    preferred_integration_id: integration.id,
   });
   return c.json({ message: "User preference updated" }, 200);
 });
