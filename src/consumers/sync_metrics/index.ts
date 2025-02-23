@@ -29,6 +29,8 @@ async function handleSyncMetricsMessagePayload({
     new Date(endTime)
   );
   console.log("response.data", response.data);
+  if (!response.data.data) throw new Error("No data returned from Oura");
+
   const { day, score } = response.data.data[0];
 
   const resolvedDailyMetric = await upsertResolvedDailyMetric(
