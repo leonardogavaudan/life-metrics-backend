@@ -1,14 +1,20 @@
 import { Hono } from "hono";
 import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
 import { getContextWithValidation } from "../../context";
-import { getUserPreferencesWithIntegrationsByUserId } from "../../database/user-preferences/database.user-preferences";
+import {
+  getUserPreferencesWithIntegrationsByUserId,
+  softDeleteUserPreferenceByUserIdAndMetricType,
+  upsertUserPreferenceByUserIdAndMetricType,
+} from "../../database/user-preferences/database.user-preferences";
 import {
   MetricTypes,
   MetricTypeToCategory,
   MetricTypeToDisplayName,
   MetricTypeToProviders,
+  MetricTypeValidator,
 } from "../../types/types.metrics";
 import { getIntegrationsByUserId } from "../../database/integration";
+import { IntegrationProvidersValidator } from "../../types/types.provider";
 
 export const userPreferencesRouter = new Hono();
 
@@ -52,4 +58,48 @@ userPreferencesRouter.get("/", jwtMiddleware, async (c) => {
     }),
   };
   return c.json(responseBody);
+});
+
+userPreferencesRouter.put("/:metricType", jwtMiddleware, async (c) => {
+  const context = getContextWithValidation(JwtContext);
+  if (!context.success) {
+    throw context.error;
+  }
+  const userId = context.data.user.id;
+  const metricType = c.req.param("metricType");
+  const metricTypeParsed = MetricTypeValidator.safeParse(metricType);
+  if (!metricTypeParsed.success) {
+    return c.json({ error: "Invalid metric type" }, 400);
+  }
+
+  const { provider } = await c.req.json();
+  if (!provider) {
+    return c.json({ error: "Provider is required" }, 400);
+  }
+
+  const providerParsed = IntegrationProvidersValidator.safeParse(provider);
+  if (!providerParsed.success) {
+    return c.json({ error: "Invalid provider" }, 400);
+  }
+
+  await upsertUserPreferenceByUserIdAndMetricType(userId, metricType, {
+    preferred_integration_id: provider,
+  });
+  return c.json({ message: "User preference updated" }, 200);
+});
+
+userPreferencesRouter.delete("/:metricType", jwtMiddleware, async (c) => {
+  const context = getContextWithValidation(JwtContext);
+  if (!context.success) {
+    throw context.error;
+  }
+  const userId = context.data.user.id;
+  const metricType = c.req.param("metricType");
+  const metricTypeParsed = MetricTypeValidator.safeParse(metricType);
+  if (!metricTypeParsed.success) {
+    return c.json({ error: "Invalid metric type" }, 400);
+  }
+
+  await softDeleteUserPreferenceByUserIdAndMetricType(userId, metricType);
+  return c.json({ message: "User preference deleted" }, 200);
 });

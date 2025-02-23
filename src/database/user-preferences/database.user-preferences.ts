@@ -36,3 +36,25 @@ export async function softDeleteUserPreferenceByUserIdAndMetricType(
     AND metric_type = ${metricType}
   `;
 }
+
+export type UpsertUserPreferencesPayload = Pick<
+  UserPreferences,
+  "preferred_integration_id"
+>;
+
+export async function upsertUserPreferenceByUserIdAndMetricType(
+  userId: string,
+  metricType: string,
+  payload: UpsertUserPreferencesPayload
+): Promise<void> {
+  await sql`
+    INSERT INTO user_preferences (user_id, metric_type, preferred_integration_id)
+    VALUES (${userId}, ${metricType}, ${payload.preferred_integration_id})
+    ON CONFLICT (user_id, metric_type)
+    DO UPDATE SET
+      preferred_integration_id = EXCLUDED.preferred_integration_id,
+      updated_at = CURRENT_TIMESTAMP
+      deleted_on = NULL
+    WHERE user_preferences.deleted_on IS NULL
+  `;
+}
