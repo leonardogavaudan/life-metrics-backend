@@ -53,7 +53,7 @@ export async function upsertUserPreferenceByUserIdAndMetricType(
     ON CONFLICT (user_id, metric_type)
     DO UPDATE SET
       preferred_integration_id = EXCLUDED.preferred_integration_id,
-      updated_at = CURRENT_TIMESTAMP
+      updated_at = CURRENT_TIMESTAMP,
       deleted_on = NULL
     WHERE user_preferences.deleted_on IS NULL
   `;
