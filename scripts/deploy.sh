@@ -68,11 +68,11 @@ mkdir -p ~/life-metrics-backend/postgres_data
 cd ~/life-metrics-backend/
 
 echo "Stopping existing containers..."
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml down || true
+docker-compose --force-recreate --no-build -f docker-compose.yml -f docker-compose.prod.yml down || true
 echo "Pulling latest images..."
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
+docker-compose --force-recreate --no-build -f docker-compose.yml -f docker-compose.prod.yml pull
 echo "Starting services..."
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker-compose --force-recreate --no-build -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 function postgres_health_check {
   echo "Waiting for PostgreSQL to be ready..."
@@ -80,7 +80,7 @@ function postgres_health_check {
   RETRY_INTERVAL=5
 
   for i in $(seq 1 $RETRIES); do
-    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps postgres | grep -q "healthy"; then
+    if docker-compose --force-recreate --no-build -f docker-compose.yml -f docker-compose.prod.yml ps postgres | grep -q "healthy"; then
       echo "PostgreSQL is ready!"
       break
     fi
