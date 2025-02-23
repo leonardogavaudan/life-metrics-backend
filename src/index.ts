@@ -19,6 +19,9 @@ app.route("/integrations", integrationsRouter);
 app.route("/user-preferences", userPreferencesRouter);
 
 setupCronJobs();
-startConsumers();
+await startConsumers();
 
-export default app;
+export default {
+  port: 3000,
+  fetch: app.fetch,
+};
