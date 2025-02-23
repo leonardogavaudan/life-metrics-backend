@@ -19,7 +19,6 @@ app.route("/integrations", integrationsRouter);
 app.route("/user-preferences", userPreferencesRouter);
 
 setupCronJobs();
-
-await startConsumers();
+startConsumers();
 
 export default app;

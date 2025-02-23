@@ -3,7 +3,6 @@ import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
 import { getContextWithValidation } from "../../context";
 import { getUserPreferencesWithIntegrationsByUserId } from "../../database/user-preferences/database.user-preferences";
 import {
-  MetricType,
   MetricTypes,
   MetricTypeToCategory,
   MetricTypeToDisplayName,
