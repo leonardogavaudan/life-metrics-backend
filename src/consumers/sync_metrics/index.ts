@@ -29,7 +29,10 @@ async function handleSyncMetricsMessagePayload({
     new Date(endTime)
   );
   console.log("response.data", response.data);
-  if (!response.data.data) throw new Error("No data returned from Oura");
+  if (!response.data.data) {
+    console.log("No data returned from Oura");
+    return;
+  }
 
   const { day, score } = response.data.data[0];
 
