@@ -32,8 +32,7 @@ userPreferencesRouter.get("/", jwtMiddleware, async (c) => {
   const metricTypeToPreferredProvider = Object.fromEntries(
     userPreferences.map((userPreference) => [
       userPreference.metric_type,
-      // @ts-ignore
-      userPreference.integration.provider,
+      userPreference.preferred_integration_provider,
     ])
   );
   const integrations = await getIntegrationsByUserId(userId);

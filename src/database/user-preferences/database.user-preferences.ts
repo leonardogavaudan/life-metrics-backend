@@ -7,15 +7,22 @@ export type UserPreferences = {
   preferred_integration_id: string | null;
   created_at: Date;
   updated_at: Date;
+  deleted_on: Date | null;
 };
 
 export async function getUserPreferencesWithIntegrationsByUserId(
   userId: string
-): Promise<UserPreferences[]> {
+): Promise<
+  (UserPreferences & {
+    preferred_integration_id: string;
+    preferred_integration_provider: string;
+  })[]
+> {
   return await sql`
     SELECT
       user_preferences.*,
       integrations.id as preferred_integration_id
+      integrations.provider as preferred_integration_provider
     FROM user_preferences
     LEFT JOIN integrations
       ON integrations.id = user_preferences.preferred_integration_id
