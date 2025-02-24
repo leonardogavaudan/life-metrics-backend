@@ -29,7 +29,7 @@ async function handleSyncMetricsMessagePayload({
     new Date(endTime)
   );
   console.log("response.data", response.data);
-  if (!response.data.data) {
+  if (!response.data.data.length) {
     console.log("No data returned from Oura");
     return;
   }
