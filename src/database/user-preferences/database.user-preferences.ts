@@ -14,8 +14,8 @@ export async function getUserPreferencesWithIntegrationsByUserId(
   userId: string
 ): Promise<
   (UserPreferences & {
-    preferred_integration_id: string;
-    preferred_integration_provider: string;
+    preferred_integration_id: string | null;
+    preferred_integration_provider: string | null;
   })[]
 > {
   return await sql`
