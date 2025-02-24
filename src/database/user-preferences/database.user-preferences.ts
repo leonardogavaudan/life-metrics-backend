@@ -24,8 +24,7 @@ export async function getUserPreferencesWithIntegrationsByUserId(
       integrations.id as preferred_integration_id
       integrations.provider as preferred_integration_provider
     FROM user_preferences
-    LEFT JOIN integrations
-      ON integrations.id = user_preferences.preferred_integration_id
+    LEFT JOIN integrations ON integrations.id = user_preferences.preferred_integration_id
     WHERE user_preferences.user_id = ${userId}
     AND integrations.deleted_on IS NULL
     AND user_preferences.deleted_on IS NULL
