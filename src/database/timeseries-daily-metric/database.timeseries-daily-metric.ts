@@ -67,7 +67,7 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
   startTime?: Date,
   endTime?: Date
 ): Promise<TimeSeriesMetric[]> {
-  const timeSeriesMetrics = await sql`
+  const timeSeriesMetrics = sql`
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND metric_type = ${metricType}
@@ -78,7 +78,8 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
     ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
     ORDER BY event_timestamp ASC
   `;
-  return timeSeriesMetrics;
+  console.log("timeSeriesMetrics query", timeSeriesMetrics);
+  return await timeSeriesMetrics;
 }
 
 export async function deleteTimeSeriesMetric(
