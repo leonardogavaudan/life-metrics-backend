@@ -36,19 +36,21 @@ const originalSql = getConnection();
 export const sql = new Proxy(originalSql, {
   apply: function (target, thisArg, args) {
     const callerStack = new Error().stack;
-    try {
-      // @ts-ignore
-      return target.apply(thisArg, args);
-    } catch (err) {
-      // @ts-ignore
-      const wrappedError = new Error(`Database query failed: ${err.message}`);
-      // @ts-ignore
-      wrappedError.originalError = err;
-      // @ts-ignore
-      wrappedError.callerStack = callerStack;
-      // @ts-ignore
-      wrappedError.args = args;
-      throw wrappedError;
-    }
+    // @ts-ignore
+    const queryPromise = target.apply(thisArg, args);
+
+    return queryPromise.then(
+      (result) => result,
+      (err) => {
+        const wrappedError = new Error(`Database query failed: ${err.message}`);
+        // @ts-ignore
+        wrappedError.originalError = err;
+        // @ts-ignore
+        wrappedError.callerStack = callerStack;
+        // @ts-ignore
+        wrappedError.args = args;
+        throw wrappedError;
+      }
+    );
   },
 });
