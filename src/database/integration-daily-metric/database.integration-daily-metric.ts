@@ -1,4 +1,7 @@
+import { MetricType } from "../../types/types.metrics";
 import { sql } from "../connection";
+import { Integration } from "../integration/types";
+import { format } from "date-fns";
 
 export type IntegrationDailyMetric = {
   id: string;
@@ -18,7 +21,7 @@ export type CreateIntegrationDailyMetricPayload = Omit<
 >;
 
 export async function createIntegrationDailyMetric(
-  payload: CreateIntegrationDailyMetricPayload
+  payload: CreateIntegrationDailyMetricPayload,
 ): Promise<IntegrationDailyMetric> {
   const [metric] = await sql`
     INSERT INTO integration_daily_metrics (
@@ -42,7 +45,7 @@ export async function createIntegrationDailyMetric(
 }
 
 export async function upsertIntegrationDailyMetric(
-  payload: CreateIntegrationDailyMetricPayload
+  payload: CreateIntegrationDailyMetricPayload,
 ): Promise<IntegrationDailyMetric> {
   const [metric] = await sql`
     INSERT INTO integration_daily_metrics (
@@ -67,4 +70,21 @@ export async function upsertIntegrationDailyMetric(
     RETURNING *
   `;
   return metric;
+}
+
+export async function getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange(
+  metricType: MetricType,
+  integrationId: Integration["id"],
+  { startDate, endDate }: { startDate: Date; endDate: Date },
+): Promise<IntegrationDailyMetric[]> {
+  const formattedStartDate = format(startDate, "yyyy-MM-dd");
+  const formattedEndDate = format(endDate, "yyyy-MM-dd");
+
+  return await sql`
+    SELECT * from integration_daily_metrics
+    WHERE metric_type = ${metricType}
+    AND integration_id = ${integrationId}
+    AND event_date >= ${formattedStartDate}::date
+    AND event_date <= ${formattedEndDate}::date
+  `;
 }

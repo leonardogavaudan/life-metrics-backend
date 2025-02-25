@@ -28,7 +28,6 @@ userPreferencesRouter.get("/", jwtMiddleware, async (c) => {
   const userPreferences = await getUserPreferencesWithIntegrationsByUserId(
     userId
   );
-  console.log("userPreferences: ", userPreferences);
   const metricTypeToPreferredProvider = Object.fromEntries(
     userPreferences.map((userPreference) => [
       userPreference.metric_type,

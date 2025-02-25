@@ -30,3 +30,24 @@ export const MetricTypeToCategory = {
 export const MetricTypeToDisplayName = {
   [MetricTypes.DailySleepScore]: "Daily Sleep Score",
 } as const;
+
+export const MetricTypeToDefaultPreferredProviders = {
+  [MetricTypes.DailySleepScore]: [
+    IntegrationProviders.Oura,
+    IntegrationProviders.Whoop,
+    IntegrationProviders.AppleHealth,
+    IntegrationProviders.Fitbit,
+    IntegrationProviders.Garmin,
+    IntegrationProviders.Coros,
+  ],
+} as const;
+
+export const DailyMetrics = new Set([MetricTypes.DailySleepScore]);
+
+export const AveragedMetrics = new Set([MetricTypes.DailySleepScore]);
+
+export const AggregatedMetrics = new Set([]);
+
+export function shouldAverageMetric(metricType: MetricType): boolean {
+  return AveragedMetrics.has(metricType);
+}

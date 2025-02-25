@@ -7,6 +7,7 @@ import { requestContextMiddleware } from "./middleware/request_context";
 import { setupCronJobs } from "./cron";
 import { startConsumers } from "./consumers";
 import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
+import { metricsRouter } from "./routes/metrics/routes.metrics";
 
 const app = new Hono();
 
@@ -17,6 +18,7 @@ app.route("/auth", authRouter);
 app.route("/users", usersRouter);
 app.route("/integrations", integrationsRouter);
 app.route("/user-preferences", userPreferencesRouter);
+app.route("/metrics", metricsRouter);
 
 setupCronJobs();
 await startConsumers();

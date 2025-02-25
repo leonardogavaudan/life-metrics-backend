@@ -1,12 +1,12 @@
 import { getDailySleep } from "../../api/oura";
 import { getOuraClient } from "../../authentication/oura.authentication";
-import { getIntegrationByUserIdAndProvider } from "../../database/integration";
-import { upsertIntegrationDailyMetric } from "../../database/integration_daily_metric/database.integration-daily-metric";
+import { upsertIntegrationDailyMetric } from "../../database/integration-daily-metric/database.integration-daily-metric";
+import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
 import {
   createResolvedDailyMetric,
   getResolvedDailyMetricByDateAndUserId,
   ResolvedDailyMetric,
-} from "../../database/resolved_daily_metric/database.resolved-daily-metric";
+} from "../../database/resolved-daily-metric/database.resolved-daily-metric";
 import { consumeFromQueue } from "../../messaging";
 import { SyncMetricsMessagePayload } from "../../messaging/message";
 import { Queue } from "../../messaging/queue";

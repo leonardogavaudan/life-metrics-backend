@@ -1,3 +1,4 @@
+import { IntegrationProvider } from "../../types/types.provider";
 import { sql } from "../connection";
 
 export type UserPreferences = {
@@ -15,7 +16,7 @@ export async function getUserPreferencesWithIntegrationsByUserId(
 ): Promise<
   (UserPreferences & {
     preferred_integration_id: string | null;
-    preferred_integration_provider: string | null;
+    preferred_integration_provider: IntegrationProvider | null;
   })[]
 > {
   return await sql`
