@@ -111,7 +111,7 @@ async function getDashBoardMetrics(c: Context) {
       metricTypeParsed.data
     );
 
-    const summary = calculateSummary(dataPoints, metricTypeParsed.data);
+    const summary = calculateSummary(dataPoints);
 
     return c.json<GetDashboardMetricResponse>({
       data: dataPoints,
@@ -147,7 +147,7 @@ async function getDashBoardMetrics(c: Context) {
       metricTypeParsed.data
     );
 
-    const summary = calculateSummary(dataPoints, metricTypeParsed.data);
+    const summary = calculateSummary(dataPoints);
 
     return c.json<GetDashboardMetricResponse>({
       data: dataPoints,
@@ -220,10 +220,11 @@ function processTimeSeriesMetricsForTimeSlots(
   });
 }
 
-function calculateSummary(
-  dataPoints: MetricDataPoint[],
-  metricType: MetricType
-): { average?: number; trend?: number; changePercentage?: number } {
+function calculateSummary(dataPoints: MetricDataPoint[]): {
+  average?: number;
+  trend?: number;
+  changePercentage?: number;
+} {
   if (!dataPoints.length) {
     return {};
   }
