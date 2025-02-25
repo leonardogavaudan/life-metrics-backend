@@ -31,37 +31,20 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-// Get the raw SQL instance
-const rawSql = getConnection();
+// Export the original SQL instance
+export const sql = getConnection();
 
-// Create a function that wraps SQL template literals with error handling
-function enhancedSqlQuery(strings: TemplateStringsArray, ...values: any[]) {
-  // Capture the stack trace at the point of SQL call
-  const stackCapture = new Error().stack;
+// Add a global error handler for unhandled promise rejections to capture SQL errors
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise);
+  console.error("Reason:", reason);
 
-  // Return a promise that will handle any errors
-  return Promise.resolve().then(async () => {
-    try {
-      // Execute the original SQL query
-      return await rawSql(strings, ...values);
-    } catch (error) {
-      // Enhance the error with the captured stack trace
-      if (error instanceof Error) {
-        console.error("PostgreSQL Error Details:");
-        console.error(error);
-        console.error("\nOriginal Stack Trace:");
-        console.error(stackCapture);
+  // Print the stack trace
+  if (reason instanceof Error) {
+    console.error("Stack trace:");
+    console.error(reason.stack);
+  }
 
-        // Preserve the original error type and properties
-        error.stack = `${error.stack}\n\nOriginal call stack:\n${stackCapture}`;
-      }
-
-      // Re-throw the enhanced error
-      throw error;
-    }
-  });
-}
-
-// Create a tagged template function that behaves like the original SQL function
-export const sql = (strings: TemplateStringsArray, ...values: any[]) =>
-  enhancedSqlQuery(strings, ...values);
+  // Don't exit the process, just log the error
+  // This allows the application to continue running
+});
