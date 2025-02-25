@@ -36,7 +36,7 @@ export async function createTimeSeriesMetric(
       ${payload.metric_type},
       ${payload.value},
       ${payload.unit},
-      ${payload.event_timestamp}::timestamp,
+      ${payload.event_timestamp}::timestamptz,
       ${payload.integration_id},
       ${payload.sleep_id}
     )
@@ -67,26 +67,17 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
   startTime?: Date,
   endTime?: Date
 ): Promise<TimeSeriesMetric[]> {
-  let query = `
+  const timeSeriesMetrics = await sql`
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND metric_type = ${metricType}
     AND deleted_on IS NULL
+    ${
+      startTime ? sql`AND event_timestamp >= ${startTime.toISOString()}` : sql``
+    }
+    ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
+    ORDER BY event_timestamp ASC
   `;
-
-  if (startTime) {
-    query = `${query} AND event_timestamp >= ${startTime.toISOString()}`;
-  }
-
-  if (endTime) {
-    query = `${query} AND event_timestamp <= ${endTime.toISOString()}`;
-  }
-
-  query = `${query} ORDER BY event_timestamp ASC`;
-
-  console.log("query", query);
-
-  const timeSeriesMetrics = await sql`${query}`;
   return timeSeriesMetrics;
 }
 
@@ -123,7 +114,7 @@ export async function getTimeSeriesMetricsByUserId(
 
   query = `${query} ORDER BY event_timestamp ASC`;
 
-  console.log(query);
+  console.log("query", query);
 
   const timeSeriesMetrics = await sql`${query}`;
   return timeSeriesMetrics;
