@@ -59,12 +59,12 @@ async function getDashBoardMetrics(c: Context) {
     throw context.error;
   }
   const userId = context.data.user.id;
-  const metricType = c.req.param("metric");
+  const metricType = c.req.query("metric");
   const metricTypeParsed = MetricTypeValidator.safeParse(metricType);
   if (!metricTypeParsed.success) {
     return c.json({ error: "Invalid metric type" }, 400);
   }
-  const timeRange = c.req.param("time_range");
+  const timeRange = c.req.query("timeRange");
   const timeRangeParsed = TimeRangeValidator.safeParse(timeRange);
   if (!timeRangeParsed.success) {
     return c.json({ error: "Invalid time range" }, 400);
@@ -106,14 +106,12 @@ async function getDashBoardMetrics(c: Context) {
       );
     }
 
-    // Process metrics based on whether they should be averaged or aggregated
     const dataPoints = processMetricsForTimeSlots(
       metrics,
       timeSlots,
       metricTypeParsed.data
     );
 
-    // Calculate summary statistics
     const summary = calculateSummary(dataPoints, metricTypeParsed.data);
 
     return c.json<GetDashboardMetricResponse>({
@@ -127,7 +125,6 @@ async function getDashBoardMetrics(c: Context) {
       },
     });
   } else {
-    // Handle time series metrics
     const metrics = await getTimeSeriesMetricsByUserIdAndMetricType(
       userId,
       metricTypeParsed.data,
@@ -145,14 +142,12 @@ async function getDashBoardMetrics(c: Context) {
       );
     }
 
-    // Process metrics based on whether they should be averaged or aggregated
     const dataPoints = processTimeSeriesMetricsForTimeSlots(
       metrics,
       timeSlots,
       metricTypeParsed.data
     );
 
-    // Calculate summary statistics
     const summary = calculateSummary(dataPoints, metricTypeParsed.data);
 
     return c.json<GetDashboardMetricResponse>({
