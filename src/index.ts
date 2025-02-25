@@ -21,14 +21,18 @@ app.route("/user-preferences", userPreferencesRouter);
 app.route("/metrics", metricsRouter);
 
 app.onError((err, c) => {
-  console.error("Error message:", err.message);
-  if (err instanceof Error && err.stack) {
+  console.error("Error:", err);
+  if (err.stack) {
     console.error("Stack trace:", err.stack);
   }
-  if ("originalError" in err && err.originalError) {
+  // @ts-ignore
+  if (err.originalError) {
+    // @ts-ignore
     console.error("Original Postgres error:", err.originalError);
   }
-  if ("args" in err && err.args) {
+  // @ts-ignore
+  if (err.args) {
+    // @ts-ignore
     console.error("Query arguments:", err.args);
   }
   return c.text("Internal Server Error", 500);
