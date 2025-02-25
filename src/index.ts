@@ -23,7 +23,6 @@ app.route("/metrics", metricsRouter);
 app.onError((err, c) => {
   console.error("Error:", err.message);
 
-  // Format database errors more cleanly
   if (err.name === "DatabaseError") {
     console.error("Database Error Details:");
     // @ts-ignore
@@ -49,11 +48,9 @@ app.onError((err, c) => {
       }
     }
   } else {
-    // For non-database errors, just log the stack
     console.error("Stack trace:", err.stack || "No stack trace available");
   }
 
-  // Return a more informative error to the client in development
   if (process.env.NODE_ENV === "development") {
     return c.json(
       {
