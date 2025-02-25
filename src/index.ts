@@ -21,7 +21,8 @@ app.route("/user-preferences", userPreferencesRouter);
 app.route("/metrics", metricsRouter);
 
 app.onError((err, c) => {
-  console.error("Error:", err);
+  console.error("Error message:", err.message);
+  console.error("Stack trace:", err.stack);
   return c.text("Internal Server Error", 500);
 });
 
