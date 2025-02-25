@@ -31,4 +31,37 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-export const sql = getConnection();
+// Get the raw SQL instance
+const rawSql = getConnection();
+
+// Create a function that wraps SQL template literals with error handling
+function enhancedSqlQuery(strings: TemplateStringsArray, ...values: any[]) {
+  // Capture the stack trace at the point of SQL call
+  const stackCapture = new Error().stack;
+
+  // Return a promise that will handle any errors
+  return Promise.resolve().then(async () => {
+    try {
+      // Execute the original SQL query
+      return await rawSql(strings, ...values);
+    } catch (error) {
+      // Enhance the error with the captured stack trace
+      if (error instanceof Error) {
+        console.error("PostgreSQL Error Details:");
+        console.error(error);
+        console.error("\nOriginal Stack Trace:");
+        console.error(stackCapture);
+
+        // Preserve the original error type and properties
+        error.stack = `${error.stack}\n\nOriginal call stack:\n${stackCapture}`;
+      }
+
+      // Re-throw the enhanced error
+      throw error;
+    }
+  });
+}
+
+// Create a tagged template function that behaves like the original SQL function
+export const sql = (strings: TemplateStringsArray, ...values: any[]) =>
+  enhancedSqlQuery(strings, ...values);
