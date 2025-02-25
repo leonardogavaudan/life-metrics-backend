@@ -32,3 +32,23 @@ function getConnection(): SQL {
 }
 
 export const sql = getConnection();
+
+// @ts-ignore
+const originalQuery = sql.query;
+// @ts-ignore
+sql.query = async function (...args) {
+  const callerStack = new Error().stack;
+  try {
+    return await originalQuery.apply(this, args);
+  } catch (err) {
+    // @ts-ignore
+    const wrappedError = new Error(`Database query failed: ${err.message}`);
+    // @ts-ignore
+    wrappedError.originalError = err;
+    // @ts-ignore
+    wrappedError.callerStack = callerStack;
+    // @ts-ignore
+    wrappedError.args = args;
+    throw wrappedError;
+  }
+};

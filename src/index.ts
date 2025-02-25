@@ -22,7 +22,15 @@ app.route("/metrics", metricsRouter);
 
 app.onError((err, c) => {
   console.error("Error message:", err.message);
-  console.trace("Stack trace:");
+  if (err instanceof Error && err.stack) {
+    console.error("Stack trace:", err.stack);
+  }
+  if ("originalError" in err && err.originalError) {
+    console.error("Original Postgres error:", err.originalError);
+  }
+  if ("args" in err && err.args) {
+    console.error("Query arguments:", err.args);
+  }
   return c.text("Internal Server Error", 500);
 });
 
