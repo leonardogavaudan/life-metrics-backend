@@ -67,7 +67,7 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
   startTime?: Date,
   endTime?: Date
 ): Promise<TimeSeriesMetric[]> {
-  let query = sql`
+  let query = `
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND metric_type = ${metricType}
@@ -75,18 +75,16 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
   `;
 
   if (startTime) {
-    query = sql`${query} AND event_timestamp >= ${startTime.toISOString()}`;
+    query = `${query} AND event_timestamp >= ${startTime.toISOString()}`;
   }
 
   if (endTime) {
-    query = sql`${query} AND event_timestamp <= ${endTime.toISOString()}`;
+    query = `${query} AND event_timestamp <= ${endTime.toISOString()}`;
   }
 
-  query = sql`${query} ORDER BY event_timestamp ASC`;
+  query = `${query} ORDER BY event_timestamp ASC`;
 
-  console.log(query.toString());
-
-  const timeSeriesMetrics = await query;
+  const timeSeriesMetrics = await sql`${query}`;
   return timeSeriesMetrics;
 }
 
@@ -107,22 +105,22 @@ export async function getTimeSeriesMetricsByUserId(
   startTime?: Date,
   endTime?: Date
 ): Promise<TimeSeriesMetric[]> {
-  let query = sql`
+  let query = `
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND deleted_on IS NULL
   `;
 
   if (startTime) {
-    query = sql`${query} AND event_timestamp >= ${startTime.toISOString()}`;
+    query = `${query} AND event_timestamp >= ${startTime.toISOString()}`;
   }
 
   if (endTime) {
-    query = sql`${query} AND event_timestamp <= ${endTime.toISOString()}`;
+    query = `${query} AND event_timestamp <= ${endTime.toISOString()}`;
   }
 
-  query = sql`${query} ORDER BY event_timestamp ASC`;
+  query = `${query} ORDER BY event_timestamp ASC`;
 
-  const timeSeriesMetrics = await query;
+  const timeSeriesMetrics = await sql`${query}`;
   return timeSeriesMetrics;
 }

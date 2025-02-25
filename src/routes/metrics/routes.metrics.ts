@@ -1,10 +1,31 @@
+import {
+  add,
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  sub,
+} from "date-fns";
 import { Context, Hono } from "hono";
 import { getContextWithValidation } from "../../context";
-import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
+import {
+  getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange,
+  IntegrationDailyMetric,
+} from "../../database/integration-daily-metric/database.integration-daily-metric";
+import { getIntegrationsByUserId } from "../../database/integration/database.integration";
+import { Integration } from "../../database/integration/types";
+import {
+  getTimeSeriesMetricsByUserIdAndMetricType,
+  TimeSeriesMetric,
+} from "../../database/timeseries-daily-metric/database.timeseries-daily-metric";
 import {
   getUserPreferencesWithIntegrationsByUserId,
   UserPreferences,
 } from "../../database/user-preferences/database.user-preferences";
+import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
 import {
   DailyMetrics,
   MetricType,
@@ -12,6 +33,7 @@ import {
   MetricTypeValidator,
   shouldAverageMetric,
 } from "../../types/types.metrics";
+import { IntegrationProvider } from "../../types/types.provider";
 import {
   AggregationTypes,
   TimeRange,
@@ -19,34 +41,10 @@ import {
   TimeRangeValidator,
   TimeUnits,
 } from "../../types/types.time";
-import { getIntegrationsByUserId } from "../../database/integration/database.integration";
-import { IntegrationProvider } from "../../types/types.provider";
-import { Integration } from "../../database/integration/types";
-import {
-  getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange,
-  IntegrationDailyMetric,
-} from "../../database/integration-daily-metric/database.integration-daily-metric";
-import {
-  add,
-  startOfDay,
-  startOfMonth,
-  startOfWeek,
-  startOfYear,
-  endOfDay,
-  endOfWeek,
-  endOfMonth,
-  endOfYear,
-  sub,
-  format,
-} from "date-fns";
 import {
   GetDashboardMetricResponse,
   MetricDataPoint,
 } from "./routes.metrics.types";
-import {
-  getTimeSeriesMetricsByUserIdAndMetricType,
-  TimeSeriesMetric,
-} from "../../database/timeseries-daily-metric/database.timeseries-daily-metric";
 
 export const metricsRouter = new Hono();
 
