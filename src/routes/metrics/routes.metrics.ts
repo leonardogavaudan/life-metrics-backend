@@ -6,7 +6,6 @@ import {
   UserPreferences,
 } from "../../database/user-preferences/database.user-preferences";
 import {
-  AveragedMetrics,
   DailyMetrics,
   MetricType,
   MetricTypeToDefaultPreferredProviders,
@@ -43,7 +42,7 @@ import {
 import {
   GetDashboardMetricResponse,
   MetricDataPoint,
-} from "./routes.metric.types";
+} from "./routes.metrics.types";
 import {
   getTimeSeriesMetricsByUserIdAndMetricType,
   TimeSeriesMetric,

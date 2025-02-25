@@ -1,11 +1,6 @@
 import { IntegrationProvider } from "../../types/types.provider";
+import { IntegrationStatus } from "../../types/types.integrations";
 import { IntegrationProviders } from "../../types/types.provider";
-
-export enum IntegrationStatus {
-  Available = "available",
-  Connected = "connected",
-  ComingSoon = "coming_soon",
-}
 
 export interface ApiIntegration {
   id: string | null;

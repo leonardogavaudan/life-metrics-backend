@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { authRouter } from "./routes/auth";
-import { usersRouter } from "./routes/users";
-import { integrationsRouter } from "./routes/integrations";
+import { authRouter } from "./routes/auth/routes.auth";
+import { usersRouter } from "./routes/users/routes.users";
+import { integrationsRouter } from "./routes/integrations/routes.integrations";
 import { corsMiddleware } from "./middleware/cors";
 import { requestContextMiddleware } from "./middleware/request_context";
 import { setupCronJobs } from "./cron";
