@@ -22,7 +22,7 @@ app.route("/metrics", metricsRouter);
 
 app.onError((err, c) => {
   console.error("Error message:", err.message);
-  console.error("Stack trace:", err.stack);
+  console.trace("Stack trace:");
   return c.text("Internal Server Error", 500);
 });
 
