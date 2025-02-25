@@ -31,24 +31,24 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-export const sql = getConnection();
+const originalSql = getConnection();
 
-// @ts-ignore
-const originalQuery = sql.query;
-// @ts-ignore
-sql.query = async function (...args) {
-  const callerStack = new Error().stack;
-  try {
-    return await originalQuery.apply(this, args);
-  } catch (err) {
-    // @ts-ignore
-    const wrappedError = new Error(`Database query failed: ${err.message}`);
-    // @ts-ignore
-    wrappedError.originalError = err;
-    // @ts-ignore
-    wrappedError.callerStack = callerStack;
-    // @ts-ignore
-    wrappedError.args = args;
-    throw wrappedError;
-  }
-};
+export const sql = new Proxy(originalSql, {
+  apply: function (target, thisArg, args) {
+    const callerStack = new Error().stack;
+    try {
+      // @ts-ignore
+      return target.apply(thisArg, args);
+    } catch (err) {
+      // @ts-ignore
+      const wrappedError = new Error(`Database query failed: ${err.message}`);
+      // @ts-ignore
+      wrappedError.originalError = err;
+      // @ts-ignore
+      wrappedError.callerStack = callerStack;
+      // @ts-ignore
+      wrappedError.args = args;
+      throw wrappedError;
+    }
+  },
+});
