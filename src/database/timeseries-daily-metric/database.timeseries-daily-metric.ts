@@ -84,6 +84,8 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
 
   query = sql`${query} ORDER BY event_timestamp ASC`;
 
+  console.log(query.toString());
+
   const timeSeriesMetrics = await query;
   return timeSeriesMetrics;
 }
