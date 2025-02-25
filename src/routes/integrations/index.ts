@@ -5,7 +5,8 @@ import {
   softDeleteIntegrationById,
   getIntegrationsByUserId,
   upsertIntegration,
-} from "../../database/integration";
+} from "../../database/integration/database.integration";
+import { Integration } from "../../database/integration/types";
 import {
   IntegrationStatus,
   OAUTH_CONFIGS,
@@ -75,11 +76,11 @@ integrationsRouter.get("/", async (c) => {
   const connectedIntegrations = await getIntegrationsByUserId(user.id);
 
   const connectedProviders = new Set(
-    connectedIntegrations.map((i) => i.provider)
+    connectedIntegrations.map((i: Integration) => i.provider)
   );
 
   const transformedConnectedIntegrations = connectedIntegrations.map(
-    (integration) => ({
+    (integration: Integration) => ({
       id: integration.id,
       provider: integration.provider,
       name: INTEGRATION_DETAILS[integration.provider].name,

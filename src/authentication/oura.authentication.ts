@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 import {
   getIntegrationByUserIdAndProvider,
   updateIntegrationCredentials,
-} from "../database/integration";
+} from "../database/integration/database.integration";
 import { OAuthCredentials } from "../database/integration/types";
 import { IntegrationProviders } from "../types/types.provider";
 

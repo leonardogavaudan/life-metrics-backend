@@ -1,6 +1,6 @@
 import { Context, Hono } from "hono";
 import { OAuth2Client } from "google-auth-library";
-import { upsertUser, User } from "../../database/user";
+import { upsertUser, User } from "../../database/user/database.user";
 import jwt from "jsonwebtoken";
 import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
 import { getContextWithValidation } from "../../context";
@@ -38,9 +38,9 @@ function oAuth2Client(c: Context) {
 }
 
 authRouter.get("/validate", jwtMiddleware, async (c: Context) => {
-  const jwtContext = getContextWithValidation(JwtContext)
+  const jwtContext = getContextWithValidation(JwtContext);
   if (jwtContext.error) {
-    throw jwtContext.error
+    throw jwtContext.error;
   }
 
   return c.json({

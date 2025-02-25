@@ -13,9 +13,9 @@ import {
   MetricTypeToProviders,
   MetricTypeValidator,
 } from "../../types/types.metrics";
-import { getIntegrationsByUserId } from "../../database/integration";
+import { getIntegrationsByUserId } from "../../database/integration/database.integration";
 import { IntegrationProvidersValidator } from "../../types/types.provider";
-import { getIntegrationByUserIdAndProvider } from "../../database/integration";
+import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
 
 export const userPreferencesRouter = new Hono();
 

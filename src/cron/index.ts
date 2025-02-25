@@ -1,7 +1,7 @@
 import { schedule } from "node-cron";
 import { sendMessagesToQueue } from "../messaging";
 import { Queue } from "../messaging/queue";
-import { getIntegrations } from "../database/integration";
+import { getIntegrations } from "../database/integration/database.integration";
 import { createMessage, SyncMetricsMessagePayload } from "../messaging/message";
 
 export function setupCronJobs(): void {
