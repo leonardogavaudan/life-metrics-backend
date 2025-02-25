@@ -20,6 +20,11 @@ app.route("/integrations", integrationsRouter);
 app.route("/user-preferences", userPreferencesRouter);
 app.route("/metrics", metricsRouter);
 
+app.onError((err, c) => {
+  console.error("Error:", err);
+  return c.text("Internal Server Error", 500);
+});
+
 setupCronJobs();
 await startConsumers();
 

@@ -31,20 +31,4 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-// Export the original SQL instance
 export const sql = getConnection();
-
-// Add a global error handler for unhandled promise rejections to capture SQL errors
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise);
-  console.error("Reason:", reason);
-
-  // Print the stack trace
-  if (reason instanceof Error) {
-    console.error("Stack trace:");
-    console.error(reason.stack);
-  }
-
-  // Don't exit the process, just log the error
-  // This allows the application to continue running
-});
