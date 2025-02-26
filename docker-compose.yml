@@ -39,7 +39,6 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
-      - ./rabbitmq-plugins:/etc/rabbitmq/enabled_plugins
     environment:
       - RABBITMQ_PLUGINS_DIR=/plugins
       - RABBITMQ_ENABLED_PLUGINS_FILE=/etc/rabbitmq/enabled_plugins
