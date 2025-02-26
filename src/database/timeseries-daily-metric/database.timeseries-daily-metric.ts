@@ -1,4 +1,4 @@
-import { sql } from "../connection";
+import { sql } from "../database.connection";
 import { handleDatabaseErrors } from "../database.error";
 
 export type TimeSeriesMetric = {

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
-import { getContextWithValidation } from "../../context";
+import { JwtContext, jwtMiddleware } from "../../middleware/middleware.jwt";
+import { getContextWithValidation } from "../../context/context";
 import {
   getUserPreferencesWithIntegrationsByUserId,
   softDeleteUserPreferenceByUserIdAndMetricType,

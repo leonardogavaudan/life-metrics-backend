@@ -1,5 +1,5 @@
 import { IntegrationProvider } from "../../types/types.provider";
-import { sql } from "../connection";
+import { sql } from "../database.connection";
 
 export type UserPreferences = {
   id: string;

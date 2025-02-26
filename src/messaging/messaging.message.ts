@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { Queue } from "./queue";
+import { Queue } from "./messaging.queue";
 import { IntegrationProvider } from "../types/types.provider";
 
 export function createMessage<T>(queue: Queue, payload: T): Message {

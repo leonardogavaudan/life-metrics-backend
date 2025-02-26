@@ -1,4 +1,4 @@
-import { startSyncMetricsConsumer } from "./sync_metrics";
+import { startSyncMetricsConsumer } from "./sync-metrics/consumers.sync-metrics";
 
 export async function startConsumers(): Promise<void> {
   console.log("Starting consumers...");

@@ -1,5 +1,8 @@
-import { sql } from "../connection";
-import { CredentialsForProvider, Integration } from "./types";
+import { sql } from "../database.connection";
+import {
+  CredentialsForProvider,
+  Integration,
+} from "./database.integration.types";
 import { IntegrationProvider } from "../../types/types.provider";
 
 export async function getIntegrations(): Promise<Integration[]> {

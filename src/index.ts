@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { startConsumers } from "./consumers";
-import { setupCronJobs } from "./cron";
+import { setupCronJobs } from "./cron/cron";
 import { isDatabaseError } from "./database/database.error";
-import { corsMiddleware } from "./middleware/cors";
-import { requestContextMiddleware } from "./middleware/request_context";
+import { corsMiddleware } from "./middleware/middleware.cors";
+import { requestContextMiddleware } from "./middleware/middleware.request-context";
 import { authRouter } from "./routes/auth/routes.auth";
 import { integrationsRouter } from "./routes/integrations/routes.integrations";
 import { metricsRouter } from "./routes/metrics/routes.metrics";

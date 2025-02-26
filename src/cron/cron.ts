@@ -1,8 +1,11 @@
 import { schedule } from "node-cron";
-import { sendMessagesToQueue } from "../messaging";
-import { Queue } from "../messaging/queue";
+import { sendMessagesToQueue } from "../messaging/messaging.queue";
+import { Queue } from "../messaging/messaging.queue";
 import { getIntegrations } from "../database/integration/database.integration";
-import { createMessage, SyncMetricsMessagePayload } from "../messaging/message";
+import {
+  createMessage,
+  SyncMetricsMessagePayload,
+} from "../messaging/messaging.message";
 
 export function setupCronJobs(): void {
   schedule("*/5 * * * *", async () => {

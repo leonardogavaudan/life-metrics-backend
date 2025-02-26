@@ -10,13 +10,13 @@ import {
   sub,
 } from "date-fns";
 import { Context, Hono } from "hono";
-import { getContextWithValidation } from "../../context";
+import { getContextWithValidation } from "../../context/context";
 import {
   getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange,
   IntegrationDailyMetric,
 } from "../../database/integration-daily-metric/database.integration-daily-metric";
 import { getIntegrationsByUserId } from "../../database/integration/database.integration";
-import { Integration } from "../../database/integration/types";
+import { Integration } from "../../database/integration/database.integration.types";
 import {
   getTimeSeriesMetricsByUserIdAndMetricType,
   TimeSeriesMetric,
@@ -25,7 +25,7 @@ import {
   getUserPreferencesWithIntegrationsByUserId,
   UserPreferences,
 } from "../../database/user-preferences/database.user-preferences";
-import { JwtContext, jwtMiddleware } from "../../middleware/jwt";
+import { JwtContext, jwtMiddleware } from "../../middleware/middleware.jwt";
 import {
   DailyMetrics,
   MetricType,

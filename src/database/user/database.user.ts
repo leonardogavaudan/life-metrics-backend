@@ -1,4 +1,4 @@
-import { sql } from "../connection";
+import { sql } from "../database.connection";
 
 export interface User {
   id: string;

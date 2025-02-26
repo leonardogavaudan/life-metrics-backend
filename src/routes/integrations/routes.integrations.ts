@@ -1,12 +1,15 @@
 import { Context, Hono } from "hono";
-import { jwtValidationMiddleware, JwtPayload } from "../../middleware/jwt";
+import {
+  jwtValidationMiddleware,
+  JwtPayload,
+} from "../../middleware/middleware.jwt";
 import axios from "axios";
 import {
   softDeleteIntegrationById,
   getIntegrationsByUserId,
   upsertIntegration,
 } from "../../database/integration/database.integration";
-import { Integration } from "../../database/integration/types";
+import { Integration } from "../../database/integration/database.integration.types";
 import {
   OAUTH_CONFIGS,
   OAuthState,

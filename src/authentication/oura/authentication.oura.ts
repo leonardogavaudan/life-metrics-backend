@@ -2,9 +2,9 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 import {
   getIntegrationByUserIdAndProvider,
   updateIntegrationCredentials,
-} from "../database/integration/database.integration";
-import { OAuthCredentials } from "../database/integration/types";
-import { IntegrationProviders } from "../types/types.provider";
+} from "../../database/integration/database.integration";
+import { OAuthCredentials } from "../../database/integration/database.integration.types";
+import { IntegrationProviders } from "../../types/types.provider";
 
 const OURA_CLIENT_ID = process.env.OURA_CLIENT_ID;
 if (!OURA_CLIENT_ID) {
