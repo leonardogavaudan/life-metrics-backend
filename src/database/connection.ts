@@ -31,42 +31,4 @@ function getConnection(): SQL {
   return sqlInstance;
 }
 
-const originalSql = getConnection();
-
-export const sql = new Proxy(originalSql, {
-  apply: function (target, thisArg, args) {
-    const callerStack = new Error().stack;
-    // @ts-ignore
-    const queryPromise = target.apply(thisArg, args);
-
-    return queryPromise.then(
-      (result) => result,
-      (err) => {
-        // Create a cleaner error object with better structure
-        const wrappedError = new Error(`Database query failed: ${err.message}`);
-        // @ts-ignore
-        wrappedError.name = "DatabaseError";
-        // @ts-ignore
-        wrappedError.originalError = err;
-        // @ts-ignore
-        wrappedError.callerStack = callerStack;
-
-        // Only include the first argument if it's a template strings array
-        // This avoids including rejected promises in the error output
-        if (args[0] && args[0].raw) {
-          // @ts-ignore
-          wrappedError.query = args[0].raw.join("?");
-          // @ts-ignore
-          wrappedError.params = args
-            .slice(1)
-            .filter((param) => !(param instanceof Promise));
-        } else {
-          // @ts-ignore
-          wrappedError.args = args.filter((arg) => !(arg instanceof Promise));
-        }
-
-        throw wrappedError;
-      }
-    );
-  },
-});
+export const sql = getConnection();

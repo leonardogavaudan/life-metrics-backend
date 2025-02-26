@@ -1,4 +1,5 @@
 import { sql } from "../connection";
+import { handleDatabaseErrors } from "../database.error";
 
 export type TimeSeriesMetric = {
   id: string;
@@ -67,19 +68,51 @@ export async function getTimeSeriesMetricsByUserIdAndMetricType(
   startTime?: Date,
   endTime?: Date
 ): Promise<TimeSeriesMetric[]> {
-  const timeSeriesMetrics = sql`
+  // For the simplest case with no time filters
+  if (!startTime && !endTime) {
+    return await sql`
+      SELECT * FROM time_series_metrics
+      WHERE user_id = ${userId}
+      AND metric_type = ${metricType}
+      AND deleted_on IS NULL
+      ORDER BY event_timestamp ASC
+    `;
+  }
+
+  // With startTime only
+  if (startTime && !endTime) {
+    return await sql`
+      SELECT * FROM time_series_metrics
+      WHERE user_id = ${userId}
+      AND metric_type = ${metricType}
+      AND deleted_on IS NULL
+      AND event_timestamp >= ${startTime.toISOString()}
+      ORDER BY event_timestamp ASC
+    `;
+  }
+
+  // With endTime only
+  if (!startTime && endTime) {
+    return await sql`
+      SELECT * FROM time_series_metrics
+      WHERE user_id = ${userId}
+      AND metric_type = ${metricType}
+      AND deleted_on IS NULL
+      AND event_timestamp <= ${endTime.toISOString()}
+      ORDER BY event_timestamp ASC
+    `;
+  }
+
+  // With both startTime and endTime
+  return await sql`
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND metric_type = ${metricType}
     AND deleted_on IS NULL
-    ${
-      startTime ? sql`AND event_timestamp >= ${startTime.toISOString()}` : sql``
-    }
-    ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
+    AND event_timestamp >= ${startTime!.toISOString()}
+    AND event_timestamp <= ${endTime!.toISOString()}
     ORDER BY event_timestamp ASC
   `;
-  console.log("timeSeriesMetrics query", timeSeriesMetrics);
-  return await timeSeriesMetrics;
 }
 
 export async function deleteTimeSeriesMetric(
@@ -94,29 +127,24 @@ export async function deleteTimeSeriesMetric(
   return deletedMetric || null;
 }
 
-export async function getTimeSeriesMetricsByUserId(
-  userId: string,
-  startTime?: Date,
-  endTime?: Date
-): Promise<TimeSeriesMetric[]> {
-  let query = `
-    SELECT * FROM time_series_metrics
-    WHERE user_id = ${userId}
-    AND deleted_on IS NULL
-  `;
-
-  if (startTime) {
-    query = `${query} AND event_timestamp >= ${startTime.toISOString()}`;
+export const getTimeSeriesMetricsByUserId = handleDatabaseErrors(
+  async function getTimeSeriesMetricsByUserId(
+    userId: string,
+    startTime?: Date,
+    endTime?: Date
+  ): Promise<TimeSeriesMetric[]> {
+    const timeSeriesMetrics = await sql`
+      SELECT * FROM time_series_metrics
+      WHERE user_id = ${userId}
+      ${
+        startTime
+          ? sql`AND event_timestamp >= ${startTime.toISOString()}`
+          : sql``
+      }
+      ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
+      AND deleted_on IS NULL
+      RDER BY event_timestamp ASC
+    `;
+    return timeSeriesMetrics;
   }
-
-  if (endTime) {
-    query = `${query} AND event_timestamp <= ${endTime.toISOString()}`;
-  }
-
-  query = `${query} ORDER BY event_timestamp ASC`;
-
-  console.log("query", query);
-
-  const timeSeriesMetrics = await sql`${query}`;
-  return timeSeriesMetrics;
-}
+);

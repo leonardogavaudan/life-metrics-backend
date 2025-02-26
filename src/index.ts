@@ -1,13 +1,14 @@
 import { Hono } from "hono";
-import { authRouter } from "./routes/auth/routes.auth";
-import { usersRouter } from "./routes/users/routes.users";
-import { integrationsRouter } from "./routes/integrations/routes.integrations";
+import { startConsumers } from "./consumers";
+import { setupCronJobs } from "./cron";
+import { isDatabaseError } from "./database/database.error";
 import { corsMiddleware } from "./middleware/cors";
 import { requestContextMiddleware } from "./middleware/request_context";
-import { setupCronJobs } from "./cron";
-import { startConsumers } from "./consumers";
-import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
+import { authRouter } from "./routes/auth/routes.auth";
+import { integrationsRouter } from "./routes/integrations/routes.integrations";
 import { metricsRouter } from "./routes/metrics/routes.metrics";
+import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
+import { usersRouter } from "./routes/users/routes.users";
 
 const app = new Hono();
 
@@ -23,34 +24,32 @@ app.route("/metrics", metricsRouter);
 app.onError((err, c) => {
   console.error("Error:", err.message);
 
-  if (err.name === "DatabaseError") {
-    console.error("Database Error Details:");
-    // @ts-ignore
-    console.error("  Query:", err.query || "Unknown");
-    // @ts-ignore
-    console.error("  Parameters:", err.params || []);
+  // Create a structured error log with relevant information
+  const errorLog: Record<string, any> = {
+    message: err.message,
+    type: err.name,
+    stack: err.stack || "No stack trace available",
+  };
 
-    // @ts-ignore
-    if (err.callerStack) {
-      console.error("Application Stack:");
-      // @ts-ignore
-      console.error(err.callerStack);
-    }
-
-    // @ts-ignore
-    if (err.originalError) {
-      // @ts-ignore
-      console.error("Original Error:", err.originalError.message);
-      // @ts-ignore
-      if (err.originalError.code) {
-        // @ts-ignore
-        console.error("Error Code:", err.originalError.code);
-      }
-    }
-  } else {
-    console.error("Stack trace:", err.stack || "No stack trace available");
+  // Add database-specific error details if available
+  if (isDatabaseError(err)) {
+    Object.assign(errorLog, {
+      query: err.query || "Unknown",
+      params: err.params || [],
+      callerStack: err.callerStack || null,
+      originalError: err.originalError
+        ? {
+            message: err.originalError.message,
+            code: err.originalError.code,
+          }
+        : null,
+    });
   }
 
+  // Log the structured error
+  console.error("Error details:", JSON.stringify(errorLog, null, 2));
+
+  // Return appropriate response based on environment
   if (process.env.NODE_ENV === "development") {
     return c.json(
       {
