@@ -56,15 +56,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "rabbitmqctl",
-          "status",
-          "&&",
-          "rabbitmqctl",
-          "list_users",
-          "|",
-          "grep",
-          "${RABBITMQ_USER}",
+          "CMD-SHELL",
+          "rabbitmqctl status && rabbitmqctl list_users | grep ${RABBITMQ_USER}",
         ]
       interval: 5s
       timeout: 5s
