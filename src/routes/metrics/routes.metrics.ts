@@ -169,6 +169,7 @@ function processMetricsForTimeSlots(
   metricType: MetricType
 ): MetricDataPoint[] {
   const isAveraged = shouldAverageMetric(metricType);
+  console.log("isAveraged", isAveraged);
 
   return timeSlots.map((slot) => {
     const metricsInSlot = metrics.filter((metric) => {
