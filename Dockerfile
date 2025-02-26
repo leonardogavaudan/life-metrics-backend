@@ -4,9 +4,12 @@ WORKDIR /app
 
 COPY package.json bun.lockb ./
 
-RUN bun install
+
+RUN apt-get update && apt-get install -y unzip
 
 RUN bun upgrade --canary
+
+RUN bun install
 
 COPY . .
 
