@@ -1,6 +1,6 @@
 import { ConsumeMessage } from "amqplib";
-import { Message } from "./messaging.message";
 import { getConnection } from "./messaging.connection";
+import { Message } from "./messaging.message";
 
 export async function sendMessagesToQueue(
   queue: Queue,
@@ -12,6 +12,25 @@ export async function sendMessagesToQueue(
   for (const message of messages) {
     channel.sendToQueue(queue, message.content, message.properties);
   }
+  await channel.waitForConfirms();
+  await channel.close();
+}
+
+export async function publishDelayedMessagesToExchange(
+  exchange: Exchange,
+  routingKey: Queue,
+  messages: Message[]
+): Promise<void> {
+  console.log(
+    `Publishing ${messages.length} delayed messages to exchange ${exchange} with routing key ${routingKey}`
+  );
+  const conn = await getConnection();
+  const channel = await conn.createConfirmChannel();
+
+  for (const message of messages) {
+    channel.publish(exchange, routingKey, message.content, message.properties);
+  }
+
   await channel.waitForConfirms();
   await channel.close();
 }
@@ -45,6 +64,11 @@ export async function consumeFromQueue(
     console.error(`Channel error for queue ${queue}:`, err);
   });
 }
+
 export enum Queue {
   SyncMetrics = "sync_metrics",
+}
+
+export enum Exchange {
+  DelayedSyncMetrics = "delayed_sync_metrics",
 }

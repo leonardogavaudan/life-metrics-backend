@@ -7,9 +7,8 @@ import {
   getResolvedDailyMetricByDateAndUserId,
   ResolvedDailyMetric,
 } from "../../database/resolved-daily-metric/database.resolved-daily-metric";
-import { consumeFromQueue } from "../../messaging/messaging.queue";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";
-import { Queue } from "../../messaging/messaging.queue";
+import { consumeFromQueue, Queue } from "../../messaging/messaging.queue";
 import { MetricTypes, Units } from "../../types/types.metrics";
 
 async function handleSyncMetricsMessagePayload({
@@ -98,8 +97,8 @@ export async function startSyncMetricsConsumer(): Promise<void> {
   console.log("Sync metrics consumer started successfully");
 }
 
-// const startTime = "2025-02-20T15:20:00.130Z";
-// const endTime = "2025-02-20T15:25:00.130Z";
+// const startTime = "2025-02-21T15:20:00.130Z";
+// const endTime = "2025-02-21T15:25:00.130Z";
 // await handleSyncMetricsMessagePayload({
 //   userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
 //   provider: "oura",

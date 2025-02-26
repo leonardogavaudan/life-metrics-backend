@@ -5,6 +5,7 @@ import { isDatabaseError } from "./database/database.error";
 import { corsMiddleware } from "./middleware/middleware.cors";
 import { requestContextMiddleware } from "./middleware/middleware.request-context";
 import { authRouter } from "./routes/auth/routes.auth";
+import { historicalSyncRouter } from "./routes/historical-sync/routes.historical-sync";
 import { integrationsRouter } from "./routes/integrations/routes.integrations";
 import { metricsRouter } from "./routes/metrics/routes.metrics";
 import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
@@ -20,6 +21,7 @@ app.route("/users", usersRouter);
 app.route("/integrations", integrationsRouter);
 app.route("/user-preferences", userPreferencesRouter);
 app.route("/metrics", metricsRouter);
+app.route("/historical-sync", historicalSyncRouter);
 
 app.onError((err, c) => {
   console.error("Error:", err.message);

@@ -39,8 +39,21 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
+      - ./rabbitmq-plugins:/etc/rabbitmq/enabled_plugins
+    environment:
+      - RABBITMQ_PLUGINS_DIR=/plugins
+      - RABBITMQ_ENABLED_PLUGINS_FILE=/etc/rabbitmq/enabled_plugins
     command: >
-      bash -c "rabbitmq-server & sleep 10 && rabbitmqctl import_definitions /etc/rabbitmq/definitions.json && wait"
+      bash -c "
+        apt-get update && 
+        apt-get install -y wget && 
+        mkdir -p /plugins && 
+        wget -P /plugins https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.12.0/rabbitmq_delayed_message_exchange-3.12.0.ez && 
+        echo '[rabbitmq_management,rabbitmq_delayed_message_exchange].' > /etc/rabbitmq/enabled_plugins && 
+        rabbitmq-server & 
+        sleep 15 && 
+        rabbitmqctl import_definitions /etc/rabbitmq/definitions.json && 
+        wait"
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s

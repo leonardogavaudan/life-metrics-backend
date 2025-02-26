@@ -29,6 +29,27 @@
       "arguments": {}
     }
   ],
-  "exchanges": [],
-  "bindings": []
+  "exchanges": [
+    {
+      "name": "delayed_sync_metrics",
+      "vhost": "/",
+      "type": "x-delayed-message",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {
+        "x-delayed-type": "direct"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "delayed_sync_metrics",
+      "vhost": "/",
+      "destination": "sync_metrics",
+      "destination_type": "queue",
+      "routing_key": "sync_metrics",
+      "arguments": {}
+    }
+  ]
 }
