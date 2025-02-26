@@ -62,58 +62,27 @@ export async function getTimeSeriesMetricsByUserIdAndTimeRange(
   return timeSeriesMetrics;
 }
 
-export async function getTimeSeriesMetricsByUserIdAndMetricType(
-  userId: string,
-  metricType: string,
-  startTime?: Date,
-  endTime?: Date
-): Promise<TimeSeriesMetric[]> {
-  // For the simplest case with no time filters
-  if (!startTime && !endTime) {
-    return await sql`
-      SELECT * FROM time_series_metrics
-      WHERE user_id = ${userId}
-      AND metric_type = ${metricType}
-      AND deleted_on IS NULL
-      ORDER BY event_timestamp ASC
-    `;
-  }
-
-  // With startTime only
-  if (startTime && !endTime) {
-    return await sql`
-      SELECT * FROM time_series_metrics
-      WHERE user_id = ${userId}
-      AND metric_type = ${metricType}
-      AND deleted_on IS NULL
-      AND event_timestamp >= ${startTime.toISOString()}
-      ORDER BY event_timestamp ASC
-    `;
-  }
-
-  // With endTime only
-  if (!startTime && endTime) {
-    return await sql`
-      SELECT * FROM time_series_metrics
-      WHERE user_id = ${userId}
-      AND metric_type = ${metricType}
-      AND deleted_on IS NULL
-      AND event_timestamp <= ${endTime.toISOString()}
-      ORDER BY event_timestamp ASC
-    `;
-  }
-
-  // With both startTime and endTime
-  return await sql`
+export const getTimeSeriesMetricsByUserIdAndMetricType = handleDatabaseErrors(
+  async function getTimeSeriesMetricsByUserIdAndMetricType(
+    userId: string,
+    metricType: string,
+    startTime?: Date,
+    endTime?: Date
+  ): Promise<TimeSeriesMetric[]> {
+    const timeSeriesMetrics = await sql`
     SELECT * FROM time_series_metrics
     WHERE user_id = ${userId}
     AND metric_type = ${metricType}
     AND deleted_on IS NULL
-    AND event_timestamp >= ${startTime!.toISOString()}
-    AND event_timestamp <= ${endTime!.toISOString()}
+    ${
+      startTime ? sql`AND event_timestamp >= ${startTime.toISOString()}` : sql``
+    }
+    ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
     ORDER BY event_timestamp ASC
   `;
-}
+    return timeSeriesMetrics;
+  }
+);
 
 export async function deleteTimeSeriesMetric(
   id: string
@@ -143,7 +112,7 @@ export const getTimeSeriesMetricsByUserId = handleDatabaseErrors(
       }
       ${endTime ? sql`AND event_timestamp <= ${endTime.toISOString()}` : sql``}
       AND deleted_on IS NULL
-      RDER BY event_timestamp ASC
+      ORDER BY event_timestamp ASC
     `;
     return timeSeriesMetrics;
   }
