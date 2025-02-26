@@ -82,6 +82,7 @@ async function getDashBoardMetrics(c: Context) {
   }
 
   const timeSlots = getTimeSlots(timeRangeParsed.data);
+  console.log("timeSlots", timeSlots);
   if (!timeSlots.length) throw new Error("Timeslots must not be empty");
   const startDate = timeSlots[0].start;
   const endDate = timeSlots[timeSlots.length - 1].end;
@@ -93,6 +94,7 @@ async function getDashBoardMetrics(c: Context) {
         integrationDetails.integrationId,
         { startDate, endDate }
       );
+    console.log("metrics", metrics);
     if (!metrics.length) {
       return c.json<GetDashboardMetricResponse>(
         {
@@ -108,6 +110,7 @@ async function getDashBoardMetrics(c: Context) {
       timeSlots,
       metricTypeParsed.data
     );
+    console.log("dataPoints", dataPoints);
 
     const summary = calculateSummary(dataPoints);
 
