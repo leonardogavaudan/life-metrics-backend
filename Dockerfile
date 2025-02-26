@@ -6,6 +6,8 @@ COPY package.json bun.lockb ./
 
 RUN bun install
 
+RUN bun upgrade --canary
+
 COPY . .
 
 EXPOSE 3000

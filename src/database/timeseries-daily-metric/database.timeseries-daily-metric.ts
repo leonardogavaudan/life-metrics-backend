@@ -117,3 +117,15 @@ export const getTimeSeriesMetricsByUserId = handleDatabaseErrors(
     return timeSeriesMetrics;
   }
 );
+
+// const userId = "68dd1648-73d9-49ce-8034-1f8887f25a96";
+// const metricType = MetricTypes.DailySleepScore;
+// const startDate = new Date("2025-02-01");
+// const endDate = new Date("2025-02-28");
+// const metrics = await getTimeSeriesMetricsByUserIdAndMetricType(
+//   userId,
+//   metricType,
+//   startDate,
+//   endDate
+// );
+// console.log(metrics);
