@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { startConsumers } from "./consumers";
+import { startConsumers } from "./consumers/consumers.setup";
 import { setupCronJobs } from "./cron/cron";
 import { isDatabaseError } from "./database/database.error";
 import { corsMiddleware } from "./middleware/middleware.cors";
