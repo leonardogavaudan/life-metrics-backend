@@ -187,7 +187,7 @@ function processMetricsForTimeSlots(
 
     return {
       timestamp: slot.start.toISOString(),
-      value: isAveraged ? sum / metricsInSlot.length : sum,
+      value: Number((isAveraged ? sum / metricsInSlot.length : sum).toFixed(2)),
     };
   });
 }
@@ -216,7 +216,7 @@ function processTimeSeriesMetricsForTimeSlots(
 
     return {
       timestamp: slot.start.toISOString(),
-      value: isAveraged ? sum / metricsInSlot.length : sum,
+      value: Number((isAveraged ? sum / metricsInSlot.length : sum).toFixed(2)),
     };
   });
 }
@@ -233,17 +233,23 @@ function calculateSummary(dataPoints: MetricDataPoint[]): {
   const nonZeroPoints = dataPoints.filter((point) => point.value > 0);
   const average =
     nonZeroPoints.length > 0
-      ? nonZeroPoints.reduce((acc, point) => acc + point.value, 0) /
-        nonZeroPoints.length
+      ? Number(
+          (
+            nonZeroPoints.reduce((acc, point) => acc + point.value, 0) /
+            nonZeroPoints.length
+          ).toFixed(2)
+        )
       : 0;
 
   const nonZeroValues = nonZeroPoints.map((point) => point.value);
   const firstValue = nonZeroValues[0] || 0;
   const lastValue = nonZeroValues[nonZeroValues.length - 1] || 0;
-  const trend = lastValue - firstValue;
+  const trend = Number((lastValue - firstValue).toFixed(2));
 
   const changePercentage =
-    firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
+    firstValue > 0
+      ? Number((((lastValue - firstValue) / firstValue) * 100).toFixed(2))
+      : 0;
 
   return {
     average,
