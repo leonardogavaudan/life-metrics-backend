@@ -54,10 +54,22 @@ services:
         rabbitmqctl import_definitions /etc/rabbitmq/definitions.json && 
         wait"
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 10s
+      test:
+        [
+          "CMD",
+          "rabbitmqctl",
+          "status",
+          "&&",
+          "rabbitmqctl",
+          "list_users",
+          "|",
+          "grep",
+          "${RABBITMQ_USER}",
+        ]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
 
 volumes:
   postgres_data:
