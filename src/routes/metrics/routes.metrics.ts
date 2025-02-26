@@ -87,7 +87,7 @@ async function getDashBoardMetrics(c: Context) {
   const startDate = timeSlots[0].start;
   const endDate = timeSlots[timeSlots.length - 1].end;
 
-  if (metricTypeParsed.data in DailyMetrics) {
+  if (DailyMetrics.has(metricTypeParsed.data)) {
     const metrics =
       await getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange(
         metricTypeParsed.data,
