@@ -40,7 +40,11 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
       - ./rabbitmq-init.sh:/usr/local/bin/rabbitmq-init.sh
-    command: ["/usr/local/bin/rabbitmq-init.sh"]
+    command: >
+      bash -c "
+        chmod +x /usr/local/bin/rabbitmq-init.sh &&
+        /usr/local/bin/rabbitmq-init.sh
+      "
     healthcheck:
       test:
         [
