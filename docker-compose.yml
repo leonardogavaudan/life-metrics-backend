@@ -39,28 +39,8 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
-      - ./rabbitmq-plugins:/plugins
-    environment:
-      - RABBITMQ_ENABLED_PLUGINS_FILE=/etc/rabbitmq/enabled_plugins
-    command: >
-      bash -c "
-        # First install the plugin
-        apt-get update && 
-        apt-get install -y wget && 
-        mkdir -p /plugins && 
-        wget -P /plugins https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.12.0/rabbitmq_delayed_message_exchange-3.12.0.ez && 
-        # Enable only management plugin first
-        echo '[rabbitmq_management].' > /etc/rabbitmq/enabled_plugins && 
-        # Start RabbitMQ
-        rabbitmq-server & 
-        # Wait for RabbitMQ to start
-        sleep 15 && 
-        # Enable the delayed message plugin after server is running
-        rabbitmq-plugins enable rabbitmq_delayed_message_exchange && 
-        # Import definitions
-        rabbitmqctl import_definitions /etc/rabbitmq/definitions.json && 
-        # Keep container running
-        wait"
+      - ./rabbitmq-init.sh:/usr/local/bin/rabbitmq-init.sh
+    command: ["/usr/local/bin/rabbitmq-init.sh"]
     healthcheck:
       test:
         [

@@ -103,6 +103,7 @@ jobs:
             "scripts/deploy.sh"
             "scripts/generate_definitions.sh"
             "rabbitmq_definitions.template.json"
+            "rabbitmq-init.sh"
             "docker-compose.yml"
             "docker-compose.prod.yml"
             ".env"
