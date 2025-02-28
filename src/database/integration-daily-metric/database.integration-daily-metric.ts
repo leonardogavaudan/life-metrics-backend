@@ -5,7 +5,6 @@ import { format } from "date-fns";
 
 export type IntegrationDailyMetric = {
   id: string;
-  resolved_daily_metric_id: string;
   integration_id: string;
   metric_type: string;
   value: number;
@@ -21,7 +20,7 @@ export type CreateIntegrationDailyMetricPayload = Omit<
 >;
 
 export async function createIntegrationDailyMetric(
-  payload: CreateIntegrationDailyMetricPayload
+  payload: CreateIntegrationDailyMetricPayload,
 ): Promise<IntegrationDailyMetric> {
   const [metric] = await sql`
     INSERT INTO integration_daily_metrics (
@@ -32,7 +31,6 @@ export async function createIntegrationDailyMetric(
       unit,
       event_date
     ) VALUES (
-      ${payload.resolved_daily_metric_id},
       ${payload.integration_id},
       ${payload.metric_type},
       ${payload.value},
@@ -44,10 +42,12 @@ export async function createIntegrationDailyMetric(
   return metric;
 }
 
-export async function upsertIntegrationDailyMetric(
-  payload: CreateIntegrationDailyMetricPayload
-): Promise<IntegrationDailyMetric> {
-  const [metric] = await sql`
+export async function upsertIntegrationDailyMetrics(
+  payloads: CreateIntegrationDailyMetricPayload[],
+): Promise<IntegrationDailyMetric[]> {
+  if (!payloads.length) return [];
+
+  return await sql`
     INSERT INTO integration_daily_metrics (
       resolved_daily_metric_id,
       integration_id,
@@ -55,27 +55,20 @@ export async function upsertIntegrationDailyMetric(
       value,
       unit,
       event_date
-    ) VALUES (
-      ${payload.resolved_daily_metric_id},
-      ${payload.integration_id},
-      ${payload.metric_type},
-      ${payload.value},
-      ${payload.unit},
-      ${payload.event_date}::date
-    )
+    ) VALUES
+    ${sql(payloads)}
     ON CONFLICT (integration_id, metric_type, event_date)
     DO UPDATE SET
       value = EXCLUDED.value,
       unit = EXCLUDED.unit
     RETURNING *
   `;
-  return metric;
 }
 
 export async function getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange(
   metricType: MetricType,
   integrationId: Integration["id"],
-  { startDate, endDate }: { startDate: Date; endDate: Date }
+  { startDate, endDate }: { startDate: Date; endDate: Date },
 ): Promise<IntegrationDailyMetric[]> {
   const formattedStartDate = format(startDate, "yyyy-MM-dd");
   const formattedEndDate = format(endDate, "yyyy-MM-dd");
