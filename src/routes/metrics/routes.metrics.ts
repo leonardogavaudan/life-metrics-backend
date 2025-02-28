@@ -69,7 +69,7 @@ async function getDashBoardMetrics(c: Context) {
 
   const integrationDetails = await getIntegrationProviderForMetricType(
     userId,
-    metricTypeParsed.data
+    metricTypeParsed.data,
   );
   if (!integrationDetails) {
     return c.json<GetDashboardMetricResponse>(
@@ -77,12 +77,11 @@ async function getDashBoardMetrics(c: Context) {
         data: [],
         metadata: null,
       },
-      200
+      200,
     );
   }
 
   const timeSlots = getTimeSlots(timeRangeParsed.data);
-  console.log("timeSlots", timeSlots);
   if (!timeSlots.length) throw new Error("Timeslots must not be empty");
   const startDate = timeSlots[0].start;
   const endDate = timeSlots[timeSlots.length - 1].end;
@@ -92,26 +91,23 @@ async function getDashBoardMetrics(c: Context) {
       await getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange(
         metricTypeParsed.data,
         integrationDetails.integrationId,
-        { startDate, endDate }
+        { startDate, endDate },
       );
-    console.log("metrics", metrics);
     if (!metrics.length) {
       return c.json<GetDashboardMetricResponse>(
         {
           data: [],
           metadata: null,
         },
-        200
+        200,
       );
     }
 
     const dataPoints = processMetricsForTimeSlots(
       metrics,
       timeSlots,
-      metricTypeParsed.data
+      metricTypeParsed.data,
     );
-    console.log("dataPoints", dataPoints);
-
     const summary = calculateSummary(dataPoints);
 
     return c.json<GetDashboardMetricResponse>({
@@ -129,7 +125,7 @@ async function getDashBoardMetrics(c: Context) {
       userId,
       metricTypeParsed.data,
       startDate,
-      endDate
+      endDate,
     );
 
     if (!metrics.length) {
@@ -138,14 +134,14 @@ async function getDashBoardMetrics(c: Context) {
           data: [],
           metadata: null,
         },
-        200
+        200,
       );
     }
 
     const dataPoints = processTimeSeriesMetricsForTimeSlots(
       metrics,
       timeSlots,
-      metricTypeParsed.data
+      metricTypeParsed.data,
     );
 
     const summary = calculateSummary(dataPoints);
@@ -166,10 +162,9 @@ async function getDashBoardMetrics(c: Context) {
 function processMetricsForTimeSlots(
   metrics: IntegrationDailyMetric[],
   timeSlots: { start: Date; end: Date }[],
-  metricType: MetricType
+  metricType: MetricType,
 ): MetricDataPoint[] {
   const isAveraged = shouldAverageMetric(metricType);
-  console.log("isAveraged", isAveraged);
 
   return timeSlots.map((slot) => {
     const metricsInSlot = metrics.filter((metric) => {
@@ -196,7 +191,7 @@ function processMetricsForTimeSlots(
 function processTimeSeriesMetricsForTimeSlots(
   metrics: TimeSeriesMetric[],
   timeSlots: { start: Date; end: Date }[],
-  metricType: MetricType
+  metricType: MetricType,
 ): MetricDataPoint[] {
   const isAveraged = shouldAverageMetric(metricType);
 
@@ -238,7 +233,7 @@ function calculateSummary(dataPoints: MetricDataPoint[]): {
           (
             nonZeroPoints.reduce((acc, point) => acc + point.value, 0) /
             nonZeroPoints.length
-          ).toFixed(2)
+          ).toFixed(2),
         )
       : 0;
 
@@ -365,7 +360,7 @@ function getTimeSlots(range: TimeRange): { start: Date; end: Date }[] {
 
 async function getIntegrationProviderForMetricType(
   userId: string,
-  metricType: MetricType
+  metricType: MetricType,
 ): Promise<{
   integrationProvider: IntegrationProvider;
   integrationId: Integration["id"];
@@ -374,13 +369,13 @@ async function getIntegrationProviderForMetricType(
     await getUserPreferencesWithIntegrationsByUserId(userId);
   const preference = userPreferencesWithIntegrations.find(
     (
-      preference
+      preference,
     ): preference is UserPreferences & {
       preferred_integration_id: string;
       preferred_integration_provider: IntegrationProvider;
     } =>
       preference.metric_type === metricType &&
-      preference.preferred_integration_id !== null
+      preference.preferred_integration_id !== null,
   );
   if (preference) {
     return {
@@ -390,14 +385,17 @@ async function getIntegrationProviderForMetricType(
   }
 
   const userIntegrations = await getIntegrationsByUserId(userId);
-  const providerToIntegrations = userIntegrations.reduce((acc, integration) => {
-    acc[integration.provider] = integration;
-    return acc;
-  }, {} as Record<IntegrationProvider, Integration>);
+  const providerToIntegrations = userIntegrations.reduce(
+    (acc, integration) => {
+      acc[integration.provider] = integration;
+      return acc;
+    },
+    {} as Record<IntegrationProvider, Integration>,
+  );
 
   const provider = MetricTypeToDefaultPreferredProviders[metricType].find(
     (provider): provider is IntegrationProvider =>
-      provider in providerToIntegrations
+      provider in providerToIntegrations,
   );
   if (!provider) {
     return null;
