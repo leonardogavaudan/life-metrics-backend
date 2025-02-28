@@ -1,12 +1,7 @@
 import { getDailySleep } from "../../api/oura/api.oura.index";
 import { getOuraClient } from "../../authentication/oura/authentication.oura";
-import { upsertIntegrationDailyMetric } from "../../database/integration-daily-metric/database.integration-daily-metric";
+import { upsertIntegrationDailyMetrics } from "../../database/integration-daily-metric/database.integration-daily-metric";
 import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
-import {
-  createResolvedDailyMetric,
-  getResolvedDailyMetricByDateAndUserId,
-  ResolvedDailyMetric,
-} from "../../database/resolved-daily-metric/database.resolved-daily-metric";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";
 import { consumeFromQueue, Queue } from "../../messaging/messaging.queue";
 import { MetricTypes, Units } from "../../types/types.metrics";
@@ -58,13 +53,15 @@ async function handleSyncMetricsMessagePayload({
 
   for (const res of response.data.data) {
     const { day, score } = res;
-    await upsertIntegrationDailyMetric({
-      integration_id: integration.id,
-      metric_type: MetricTypes.DailySleepScore,
-      value: score,
-      unit: Units.Points,
-      event_date: day,
-    });
+    await upsertIntegrationDailyMetrics([
+      {
+        integration_id: integration.id,
+        metric_type: MetricTypes.DailySleepScore,
+        value: score,
+        unit: Units.Points,
+        event_date: day,
+      },
+    ]);
   }
 }
 
