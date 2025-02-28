@@ -42,26 +42,7 @@ services:
       - ./rabbitmq-init.sh:/usr/local/bin/rabbitmq-init.sh
     environment:
       - RABBITMQ_ENABLED_PLUGINS_FILE=/etc/rabbitmq/enabled_plugins
-    command: >
-      bash -c "
-        # Start RabbitMQ in the background
-        rabbitmq-server &
-        
-        # Wait for RabbitMQ to start
-        until rabbitmqctl status >/dev/null 2>&1; do
-          echo 'Waiting for RabbitMQ to start...'
-          sleep 5
-        done
-        
-        # Enable the delayed message exchange plugin
-        rabbitmq-plugins enable rabbitmq_delayed_message_exchange
-        
-        # Import definitions
-        rabbitmqctl import_definitions /etc/rabbitmq/definitions.json
-        
-        # Keep the container running
-        wait
-      "
+    command: ["/usr/local/bin/rabbitmq-init.sh"]
     healthcheck:
       test:
         [
