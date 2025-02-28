@@ -42,7 +42,12 @@ services:
       - ./rabbitmq-init.sh:/usr/local/bin/rabbitmq-init.sh
     environment:
       - RABBITMQ_ENABLED_PLUGINS_FILE=/etc/rabbitmq/enabled_plugins
-    command: ["/usr/local/bin/rabbitmq-init.sh"]
+    command:
+      [
+        "sh",
+        "-c",
+        "chmod +x /usr/local/bin/rabbitmq-init.sh && /usr/local/bin/rabbitmq-init.sh",
+      ]
     healthcheck:
       test:
         [
