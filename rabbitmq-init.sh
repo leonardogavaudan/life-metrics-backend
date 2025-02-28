@@ -25,12 +25,19 @@ fi
 
 echo "Using plugins directory: $PLUGINS_DIR"
 
-# Copy the plugin
-cp /plugins/rabbitmq_delayed_message_exchange-3.12.0.ez "$PLUGINS_DIR/"
-echo "Plugin copied to: $PLUGINS_DIR/rabbitmq_delayed_message_exchange-3.12.0.ez"
+PLUGIN_SRC_PATH="/plugins/rabbitmq_delayed_message_exchange-3.12.0.ez"
+PLUGIN_DEST_PATH="$PLUGINS_DIR/rabbitmq_delayed_message_exchange-3.12.0.ez"
+
+# Copy the plugin if it doesn't exist or is different
+if [ ! -f "$PLUGIN_DEST_PATH" ] || ! cmp -s $PLUGIN_SRC_PATH "$PLUGIN_DEST_PATH"; then
+  cp /plugins/rabbitmq_delayed_message_exchange-3.12.0.ez "$PLUGINS_DIR/"
+  echo "Plugin copied to: $PLUGIN_DEST_PATH"
+else
+  echo "Plugin already exists at: $PLUGIN_DEST_PATH"
+fi
 
 # Enable the plugin before starting RabbitMQ
-echo '[rabbitmq_management,rabbitmq_delayed_message_exchange].' > /etc/rabbitmq/enabled_plugins
+echo '[rabbitmq_management,rabbitmq_delayed_message_exchange].' >/etc/rabbitmq/enabled_plugins
 echo "Enabled plugins configured"
 
 # Start RabbitMQ
@@ -53,7 +60,7 @@ done
 echo "RabbitMQ is running, importing definitions..."
 
 # Install rabbitmqadmin if not available
-if ! command -v rabbitmqadmin &> /dev/null; then
+if ! command -v rabbitmqadmin &>/dev/null; then
   echo "Installing rabbitmqadmin..."
   wget -O /usr/local/bin/rabbitmqadmin http://localhost:15672/cli/rabbitmqadmin
   chmod +x /usr/local/bin/rabbitmqadmin
@@ -62,13 +69,13 @@ fi
 # Try to import definitions
 if ! rabbitmqctl import_definitions /etc/rabbitmq/definitions.json; then
   echo "Definition import failed, creating exchanges and queues manually"
-  
+
   # Create the exchange and queue manually
   rabbitmqadmin declare exchange name=delayed_sync_metrics type=x-delayed-message \
     arguments='{"x-delayed-type":"direct"}' durable=true
-  
+
   rabbitmqadmin declare queue name=sync_metrics durable=true
-  
+
   rabbitmqadmin declare binding source=delayed_sync_metrics destination=sync_metrics \
     routing_key=sync_metrics
 fi
