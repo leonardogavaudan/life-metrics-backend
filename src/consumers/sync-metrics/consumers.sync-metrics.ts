@@ -65,11 +65,11 @@ async function handleSyncMetricsMessagePayload({
   }
 }
 
-// const startTime = "2025-02-21T15:20:00.130Z";
-// const endTime = "2025-02-21T15:25:00.130Z";
-// await handleSyncMetricsMessagePayload({
-//   userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
-//   provider: "oura",
-//   startTime,
-//   endTime,
-// });
+const startTime = "2025-02-27T15:20:00.130Z";
+const endTime = "2025-02-27T15:25:00.130Z";
+await handleSyncMetricsMessagePayload({
+  userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
+  provider: "oura",
+  startTime,
+  endTime,
+});
