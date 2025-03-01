@@ -28,10 +28,10 @@ export async function scheduleHistoricalSync({
   const batchCount = Math.ceil(totalDays / batchSizeInDays);
 
   console.log(
-    `Scheduling historical sync for user ${userId} from ${startDate} to ${endDate}`
+    `Scheduling historical sync for user ${userId} from ${startDate} to ${endDate}`,
   );
   console.log(
-    `Total days: ${totalDays}, batch size: ${batchSizeInDays} days, batch count: ${batchCount}, delay per batch: ${delayPerBatchMs}ms`
+    `Total days: ${totalDays}, batch size: ${batchSizeInDays} days, batch count: ${batchCount}, delay per batch: ${delayPerBatchMs}ms`,
   );
 
   const messages = [];
@@ -58,10 +58,12 @@ export async function scheduleHistoricalSync({
     messages.push(message);
   }
 
+  console.log("messages", messages);
+
   await publishDelayedMessagesToExchange(
     Exchange.DelayedSyncMetrics,
     Queue.SyncMetrics,
-    messages
+    messages,
   );
 
   console.log(`Scheduled ${messages.length} batches for historical sync`);
