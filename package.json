@@ -2,7 +2,8 @@
   "name": "life-metrics-backend",
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "type": "bun tsc --noEmit"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.8",

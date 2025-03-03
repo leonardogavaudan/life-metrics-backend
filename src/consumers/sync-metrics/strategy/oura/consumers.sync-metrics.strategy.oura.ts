@@ -36,7 +36,7 @@ export class SyncMetricsStrategyOura implements SyncMetricsStrategy {
     const activityResponse = await getDailyActivity(client, startTime, endTime);
     for (const activity of activityResponse.data.data) {
       dailyIntegrationMetrics.push({
-        metric_type: MetricTypes.Steps,
+        metric_type: MetricTypes.DailySteps,
         value: activity.steps,
         unit: Units.Count,
         event_date: format(new Date(activity.day), "yyyy-MM-dd"),

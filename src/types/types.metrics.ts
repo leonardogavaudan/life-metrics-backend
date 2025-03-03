@@ -10,27 +10,31 @@ export type Unit = z.infer<typeof UnitValidator>;
 
 export const MetricTypes = {
   DailySleepScore: "daily_sleep_score",
-  Steps: "steps",
+  DailySteps: "daily_steps",
 } as const;
 export const MetricTypeValidator = z.nativeEnum(MetricTypes);
 export type MetricType = z.infer<typeof MetricTypeValidator>;
 
 export const Categories = {
   Sleep: "sleep",
+  Activity: "activity",
 } as const;
 export const CategoryValidator = z.nativeEnum(Categories);
 export type Category = z.infer<typeof CategoryValidator>;
 
 export const MetricTypeToProviders = {
   [MetricTypes.DailySleepScore]: [IntegrationProviders.Oura],
+  [MetricTypes.DailySteps]: [IntegrationProviders.Oura],
 } as const;
 
 export const MetricTypeToCategory = {
   [MetricTypes.DailySleepScore]: Categories.Sleep,
+  [MetricTypes.DailySteps]: Categories.Activity,
 } as const;
 
 export const MetricTypeToDisplayName = {
   [MetricTypes.DailySleepScore]: "Daily Sleep Score",
+  [MetricTypes.DailySteps]: "Daily Steps",
 } as const;
 
 export const MetricTypeToDefaultPreferredProviders = {
@@ -42,11 +46,25 @@ export const MetricTypeToDefaultPreferredProviders = {
     IntegrationProviders.Garmin,
     IntegrationProviders.Coros,
   ],
+  [MetricTypes.DailySteps]: [
+    IntegrationProviders.Oura,
+    IntegrationProviders.Whoop,
+    IntegrationProviders.AppleHealth,
+    IntegrationProviders.Garmin,
+    IntegrationProviders.Fitbit,
+    IntegrationProviders.Coros,
+  ],
 } as const;
 
-export const DailyMetrics = new Set([MetricTypes.DailySleepScore]);
+export const DailyMetrics = new Set([
+  MetricTypes.DailySleepScore,
+  MetricTypes.DailySteps,
+]);
 
-export const AveragedMetrics = new Set([MetricTypes.DailySleepScore]);
+export const AveragedMetrics = new Set([
+  MetricTypes.DailySleepScore,
+  MetricTypes.DailySteps,
+]);
 
 export const AggregatedMetrics = new Set([]);
 
