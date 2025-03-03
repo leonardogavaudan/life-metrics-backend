@@ -3,12 +3,14 @@ import { IntegrationProviders } from "./types.provider";
 
 export const Units = {
   Points: "points",
+  Count: "count",
 } as const;
 export const UnitValidator = z.nativeEnum(Units);
 export type Unit = z.infer<typeof UnitValidator>;
 
 export const MetricTypes = {
   DailySleepScore: "daily_sleep_score",
+  Steps: "steps",
 } as const;
 export const MetricTypeValidator = z.nativeEnum(MetricTypes);
 export type MetricType = z.infer<typeof MetricTypeValidator>;
