@@ -1,4 +1,5 @@
 import { AxiosInstance, AxiosResponse } from "axios";
+import { format } from "date-fns";
 
 export interface OuraGetDailySleepResponse {
   data: {
@@ -26,8 +27,8 @@ export async function getDailySleep(
 ): Promise<AxiosResponse<OuraGetDailySleepResponse>> {
   return await client.get("/usercollection/daily_sleep", {
     params: {
-      start_date: startDate.toISOString().split("T")[0],
-      end_date: endDate.toISOString().split("T")[0],
+      start_date: format(startDate, "yyyy-MM-dd"),
+      end_date: format(endDate, "yyyy-MM-dd"),
     },
   });
 }
@@ -82,8 +83,8 @@ export async function getDailyActivity(
 ): Promise<AxiosResponse<OuraGetDailyActivityResponse>> {
   return await client.get("/usercollection/daily_activity", {
     params: {
-      start_date: startDate.toISOString().split("T")[0],
-      end_date: endDate.toISOString().split("T")[0],
+      start_date: format(startDate, "yyyy-MM-dd"),
+      end_date: format(endDate, "yyyy-MM-dd"),
     },
   });
 }

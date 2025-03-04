@@ -1,3 +1,4 @@
+import { addDays, endOfDay, format, startOfDay, toDate } from "date-fns";
 import { upsertIntegrationDailyMetrics } from "../../database/integration-daily-metric/database.integration-daily-metric";
 import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";
@@ -40,9 +41,19 @@ async function handleSyncMetricsMessagePayload({
 
   const factory = new SyncMetricsStrategyFactory();
   const strategy = factory.getSyncMetricStrategy(IntegrationProviders.Oura);
+
+  const isSameDay =
+    format(toDate(startTime), "yyyy-MM-dd") ==
+    format(toDate(endTime), "yyyy-MM-dd");
+
   const dailyIntegrationMetrics = await strategy.getDailyIntegrationMetrics(
     userId,
-    { startTime: new Date(startTime), endTime: new Date(endTime) },
+    {
+      startTime: startOfDay(toDate(startTime)),
+      endTime: isSameDay
+        ? startOfDay(addDays(toDate(endTime), 1))
+        : startOfDay(toDate(endTime)),
+    },
   );
   if (!dailyIntegrationMetrics.length) {
     console.log("No daily integration metrics found");
@@ -59,7 +70,7 @@ async function handleSyncMetricsMessagePayload({
   );
 }
 
-// const startTime = "2025-03-03T15:20:00.130Z";
+// const startTime = "2025-03-04T15:20:00.130Z";
 // const endTime = "2025-03-04T15:25:00.130Z";
 // await handleSyncMetricsMessagePayload({
 //   userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
