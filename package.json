@@ -3,7 +3,8 @@
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --hot src/index.ts",
-    "type": "bun tsc --noEmit"
+    "type": "bun tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\""
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.8",
@@ -22,6 +23,7 @@
     "@types/amqplib": "^0.10.6",
     "@types/bun": "latest",
     "@types/node-cron": "^3.0.11",
+    "prettier": "^3.2.5",
     "typescript": "^5.7.3"
   }
 }

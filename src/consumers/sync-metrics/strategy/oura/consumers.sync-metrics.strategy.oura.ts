@@ -1,8 +1,5 @@
 import { format } from "date-fns";
-import {
-  getDailyActivity,
-  getDailySleep,
-} from "../../../../api/oura/api.oura.index";
+import { getDailyActivity, getDailySleep } from "../../../../api/oura/api.oura.index";
 import { getOuraClient } from "../../../../authentication/oura/authentication.oura";
 import { User } from "../../../../database/user/database.user";
 import { MetricTypes, Units } from "../../../../types/types.metrics";
@@ -20,9 +17,7 @@ export class SyncMetricsStrategyOura implements SyncMetricsStrategy {
     const dailySleepScoreMetrics = dailySleepResponse.data.data.map(
       (
         ouraMetric,
-      ): Awaited<
-        ReturnType<SyncMetricsStrategy["getDailyIntegrationMetrics"]>
-      >[number] => {
+      ): Awaited<ReturnType<SyncMetricsStrategy["getDailyIntegrationMetrics"]>>[number] => {
         return {
           metric_type: MetricTypes.DailySleepScore,
           value: ouraMetric.score,
@@ -38,6 +33,13 @@ export class SyncMetricsStrategyOura implements SyncMetricsStrategy {
       dailyIntegrationMetrics.push({
         metric_type: MetricTypes.DailySteps,
         value: activity.steps,
+        unit: Units.Count,
+        event_date: format(new Date(activity.day), "yyyy-MM-dd"),
+      });
+
+      dailyIntegrationMetrics.push({
+        metric_type: MetricTypes.DailyTotalCalories,
+        value: activity.total_calories,
         unit: Units.Count,
         event_date: format(new Date(activity.day), "yyyy-MM-dd"),
       });

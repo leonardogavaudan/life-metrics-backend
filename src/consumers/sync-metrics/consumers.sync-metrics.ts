@@ -3,7 +3,6 @@ import { upsertIntegrationDailyMetrics } from "../../database/integration-daily-
 import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";
 import { consumeFromQueue, Queue } from "../../messaging/messaging.queue";
-import { IntegrationProviders } from "../../types/types.provider";
 import { SyncMetricsStrategyFactory } from "./strategy/consumers.sync-metrics.strategy";
 
 export async function startSyncMetricsConsumer(): Promise<void> {
@@ -13,9 +12,7 @@ export async function startSyncMetricsConsumer(): Promise<void> {
     try {
       console.log("Message:", msg);
       console.log("Message content", msg.content.toString());
-      const payload = JSON.parse(
-        msg.content.toString(),
-      ) as SyncMetricsMessagePayload;
+      const payload = JSON.parse(msg.content.toString()) as SyncMetricsMessagePayload;
       await handleSyncMetricsMessagePayload(payload);
     } catch (error) {
       console.error("Error parsing/handling sync metrics message:", error);
@@ -40,21 +37,15 @@ async function handleSyncMetricsMessagePayload({
   if (!integration) throw new Error("Integration not found");
 
   const factory = new SyncMetricsStrategyFactory();
-  const strategy = factory.getSyncMetricStrategy(IntegrationProviders.Oura);
+  const strategy = factory.getSyncMetricStrategy(provider);
 
   const isSameDay =
-    format(toDate(startTime), "yyyy-MM-dd") ==
-    format(toDate(endTime), "yyyy-MM-dd");
+    format(toDate(startTime), "yyyy-MM-dd") == format(toDate(endTime), "yyyy-MM-dd");
 
-  const dailyIntegrationMetrics = await strategy.getDailyIntegrationMetrics(
-    userId,
-    {
-      startTime: startOfDay(toDate(startTime)),
-      endTime: isSameDay
-        ? startOfDay(addDays(toDate(endTime), 1))
-        : startOfDay(toDate(endTime)),
-    },
-  );
+  const dailyIntegrationMetrics = await strategy.getDailyIntegrationMetrics(userId, {
+    startTime: startOfDay(toDate(startTime)),
+    endTime: isSameDay ? startOfDay(addDays(toDate(endTime), 1)) : startOfDay(toDate(endTime)),
+  });
   if (!dailyIntegrationMetrics.length) {
     console.log("No daily integration metrics found");
     return;
@@ -70,8 +61,8 @@ async function handleSyncMetricsMessagePayload({
   );
 }
 
-// const startTime = "2025-03-04T15:20:00.130Z";
-// const endTime = "2025-03-04T15:25:00.130Z";
+// const startTime = "2025-05-23T15:20:00.130Z";
+// const endTime = "2025-05-23T15:25:00.130Z";
 // await handleSyncMetricsMessagePayload({
 //   userId: "68dd1648-73d9-49ce-8034-1f8887f25a96",
 //   provider: "oura",
