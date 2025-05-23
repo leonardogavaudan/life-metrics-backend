@@ -1,4 +1,4 @@
-import { addDays, endOfDay, format, startOfDay, toDate } from "date-fns";
+import { addDays, format, startOfDay, toDate } from "date-fns";
 import { upsertIntegrationDailyMetrics } from "../../database/integration-daily-metric/database.integration-daily-metric";
 import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";

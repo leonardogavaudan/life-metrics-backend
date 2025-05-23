@@ -1,7 +1,18 @@
 import { cors } from "hono/cors";
 
 export const corsMiddleware = cors({
-  origin: "https://app.lifemetrics.io",
+  origin: (origin) => {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return "*";
+
+    // Allow localhost for development and the production domain
+    if (origin.includes("localhost") || 
+        origin.includes("app.lifemetrics.io")) {
+      return origin;
+    }
+
+    return false;
+  },
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: [
     "Authorization",
@@ -10,7 +21,9 @@ export const corsMiddleware = cors({
     "X-Environment",
     "User-Agent",
     "Referer",
+    "Origin",
   ],
+  exposeHeaders: ["Content-Length", "Content-Type"],
   maxAge: 86400, // 24 hours in seconds
   credentials: true,
 });
