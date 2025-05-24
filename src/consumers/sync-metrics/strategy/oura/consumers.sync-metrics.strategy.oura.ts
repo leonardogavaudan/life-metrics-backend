@@ -71,11 +71,14 @@ export class SyncMetricsStrategyOura implements SyncMetricsStrategy {
 
     return sleepSessionsResponse.data.data
       .filter((session) => session.type !== "deleted") // Skip deleted sessions
-      .map((session) => ({
-        user_id: userId,
-        start_timestamp: session.bedtime_start,
-        end_timestamp: session.bedtime_end,
-        provider_id: session.id,
-      }));
+      .map((session) => {
+        return {
+          user_id: userId,
+          start_timestamp: session.bedtime_start,
+          end_timestamp: session.bedtime_end,
+          provider_id: session.id,
+          total_sleep_seconds: session.total_sleep_duration,
+        };
+      });
   }
 }

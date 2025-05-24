@@ -51,7 +51,7 @@ export interface OuraGetSleepSessionsResponse {
     sleep_score_delta: number;
     sleep_algorithm_version: string;
     time_in_bed: number;
-    total_sleep_duration: number;
+    total_sleep_duration: number; // in seconds
     type: string;
   }[];
   next_token: string;

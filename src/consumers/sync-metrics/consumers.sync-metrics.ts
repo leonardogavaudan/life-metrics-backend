@@ -1,10 +1,16 @@
 import { addDays, format, startOfDay, toDate } from "date-fns";
 import { upsertIntegrationDailyMetrics } from "../../database/integration-daily-metric/database.integration-daily-metric";
 import { getIntegrationByUserIdAndProvider } from "../../database/integration/database.integration";
-import { upsertSleepSessions } from "../../database/sleep-sessions/database.sleep-sessions";
+import {
+  getTotalSleepSecondsByDate,
+  SleepSession,
+  upsertSleepSessions,
+} from "../../database/sleep-sessions/database.sleep-sessions";
 import { SyncMetricsMessagePayload } from "../../messaging/messaging.message";
 import { consumeFromQueue, Queue } from "../../messaging/messaging.queue";
 import { SyncMetricsStrategyFactory } from "./strategy/consumers.sync-metrics.strategy";
+import { MetricTypes, Units } from "../../types/types.metrics";
+import { Integration } from "../../database/integration/database.integration.types";
 
 export async function startSyncMetricsConsumer(): Promise<void> {
   console.log("Starting sync metrics consumer...");
@@ -71,12 +77,64 @@ async function handleSyncMetricsMessagePayload({
   // Sync sleep sessions
   const sleepSessions = await strategy.getSleepSessions(userId, timeRange);
   if (sleepSessions.length) {
-    console.log("sleepSessions", sleepSessions);
-    await upsertSleepSessions(
-      sleepSessions.map((element) => ({ ...element, integration_id: integration.id })),
-    );
+    await upsertSleepSessionsAndMetrics(sleepSessions, integration, timeRange, userId);
   } else {
     console.log("No sleep sessions found");
+  }
+}
+
+async function upsertSleepSessionsAndMetrics(
+  sleepSessions: Omit<SleepSession, "id" | "integration_id" | "created_at" | "updated_at">[],
+  integration: Integration,
+  timeRange: {
+    endTime: Date;
+    startTime: Date;
+  },
+  userId: string,
+) {
+  // console.log("sleepSessions", sleepSessions);
+
+  // Map sleep sessions with integration_id
+  const sessionsWithIntegration = sleepSessions.map((element) => ({
+    ...element,
+    integration_id: integration.id,
+  }));
+
+  // Upsert the sessions to the database
+  await upsertSleepSessions(sessionsWithIntegration);
+  // console.log(`Upserted ${sessionsWithIntegration.length} sleep sessions`);
+
+  // After upserting sleep sessions, calculate and upsert daily total sleep metrics
+  const startDate = format(timeRange.startTime, "yyyy-MM-dd");
+  const endDate = format(timeRange.endTime, "yyyy-MM-dd");
+
+  // console.log(`Fetching total sleep by date from ${startDate} to ${endDate}`);
+
+  const totalSleepByDates = await getTotalSleepSecondsByDate(
+    userId,
+    integration.id,
+    startDate,
+    endDate,
+  );
+
+  if (totalSleepByDates.length) {
+    // console.log("Total sleep by date results:", totalSleepByDates);
+
+    const dailyTotalSleepMetrics = totalSleepByDates.map((item) => ({
+      integration_id: integration.id,
+      metric_type: MetricTypes.DailyTotalSleep,
+      value: item.total_sleep_seconds,
+      unit: Units.Seconds, // Using Seconds as the unit for sleep duration
+      event_date: format(new Date(item.event_date), "yyyy-MM-dd"),
+    }));
+
+    // console.log(
+    //   `Upserting ${dailyTotalSleepMetrics.length} daily total sleep metrics:`,
+    //   dailyTotalSleepMetrics,
+    // );
+    await upsertIntegrationDailyMetrics(dailyTotalSleepMetrics);
+  } else {
+    console.log("No aggregated sleep data found for the date range");
   }
 }
 
