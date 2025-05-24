@@ -24,22 +24,17 @@ export const createIntegrationDailyMetric = handleDatabaseErrors(
     payload: CreateIntegrationDailyMetricPayload,
   ): Promise<IntegrationDailyMetric> {
     const [metric] = await sql`
-      INSERT INTO integration_daily_metrics (
-        resolved_daily_metric_id,
-        integration_id,
-        metric_type,
-        value,
-        unit,
-        event_date
-      ) VALUES (
-        ${payload.integration_id},
-        ${payload.metric_type},
-        ${payload.value},
-        ${payload.unit},
-        ${payload.event_date}::date
-      )
-      RETURNING *
-    `;
+            INSERT INTO integration_daily_metrics (integration_id,
+                                                   metric_type,
+                                                   value,
+                                                   unit,
+                                                   event_date)
+            VALUES (${payload.integration_id},
+                    ${payload.metric_type},
+                    ${payload.value},
+                    ${payload.unit},
+                    ${payload.event_date}::date) RETURNING *
+        `;
     return metric;
   },
 );
@@ -50,15 +45,15 @@ export const upsertIntegrationDailyMetrics = handleDatabaseErrors(
   ): Promise<IntegrationDailyMetric[]> {
     if (!payloads.length) return [];
 
-    return await sql`
-      INSERT INTO integration_daily_metrics
-      ${sql(payloads)}
-      ON CONFLICT (integration_id, metric_type, event_date)
-      DO UPDATE SET
-        value = EXCLUDED.value,
-        unit = EXCLUDED.unit
-      RETURNING *
-    `;
+    return sql`
+            INSERT INTO integration_daily_metrics
+                ${sql(payloads)} ON CONFLICT (integration_id, metric_type, event_date)
+            DO
+            UPDATE SET
+                value = EXCLUDED.value,
+                unit = EXCLUDED.unit
+                RETURNING *
+        `;
   },
 );
 
@@ -72,12 +67,13 @@ export const getIntegrationDailyMetricsByMetricTypeAndIntegrationIdAndTimeRange 
       const formattedStartDate = format(startDate, "yyyy-MM-dd");
       const formattedEndDate = format(endDate, "yyyy-MM-dd");
 
-      return await sql`
-      SELECT * from integration_daily_metrics
-      WHERE metric_type = ${metricType}
-      AND integration_id = ${integrationId}
-      AND event_date >= ${formattedStartDate}::date
-      AND event_date <= ${formattedEndDate}::date
-    `;
+      return sql`
+                SELECT *
+                from integration_daily_metrics
+                WHERE metric_type = ${metricType}
+                  AND integration_id = ${integrationId}
+                  AND event_date >= ${formattedStartDate}::date
+                  AND event_date <= ${formattedEndDate}:: date
+            `;
     },
   );
