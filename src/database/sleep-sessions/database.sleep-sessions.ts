@@ -45,7 +45,7 @@ export const getTotalSleepSecondsByDate = handleDatabaseErrors(
     startDate: string,
     endDate: string,
   ): Promise<TotalSleepByDate[]> {
-    return sql<TotalSleepByDate[]>`
+    return sql`
             SELECT
                 DATE (end_timestamp) as event_date, CAST (SUM (total_sleep_seconds) AS REAL) as total_sleep_seconds
             FROM sleep_sessions

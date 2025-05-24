@@ -16,6 +16,7 @@ export const MetricTypes = {
   DailyTotalSleep: "daily_total_sleep",
 } as const;
 export const MetricTypeValidator = z.nativeEnum(MetricTypes);
+
 export type MetricType = z.infer<typeof MetricTypeValidator>;
 
 export const Categories = {
