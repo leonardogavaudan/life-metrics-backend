@@ -11,6 +11,7 @@ import { metricsRouter } from "./routes/metrics/routes.metrics";
 import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
 import { usersRouter } from "./routes/users/routes.users";
 
+// test
 const app = new Hono();
 
 app.use("*", requestContextMiddleware);
@@ -59,7 +60,7 @@ app.onError((err, c) => {
         type: err.name,
         stack: err.stack?.split("\n").slice(0, 5),
       },
-      500
+      500,
     );
   }
 
