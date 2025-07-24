@@ -11,7 +11,6 @@ import { metricsRouter } from "./routes/metrics/routes.metrics";
 import { userPreferencesRouter } from "./routes/user-preferences/routes.user-preferences";
 import { usersRouter } from "./routes/users/routes.users";
 
-// test
 const app = new Hono();
 
 app.use("*", requestContextMiddleware);

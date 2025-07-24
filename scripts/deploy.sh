@@ -69,6 +69,13 @@ cd ~/life-metrics-backend/
 
 echo "Stopping existing containers..."
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml down || true
+
+if [ -f ./scripts/docker-cleanup.sh ]; then
+  echo "Running Docker cleanup to free disk space..."
+  chmod +x ./scripts/docker-cleanup.sh
+  ./scripts/docker-cleanup.sh
+fi
+
 echo "Pulling latest images..."
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
 echo "Starting services..."

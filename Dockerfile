@@ -1,15 +1,14 @@
-FROM oven/bun:canary
+FROM oven/bun:1.1.42
 
 WORKDIR /app
 
 COPY package.json bun.lockb ./
 
+RUN apt-get update && apt-get install -y unzip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y unzip
-
-RUN bun upgrade --canary
-
-RUN bun install
+RUN bun install --frozen-lockfile
 
 COPY . .
 
