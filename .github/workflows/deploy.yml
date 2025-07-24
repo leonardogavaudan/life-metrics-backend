@@ -100,8 +100,10 @@ jobs:
         run: |
           FILES=(
             "db"
+            ".dockerignore"
             "scripts/deploy.sh"
             "scripts/generate_definitions.sh"
+            "scripts/docker-cleanup.sh"
             "rabbitmq_definitions.template.json"
             "rabbitmq-init.sh"
             "docker-compose.yml"
