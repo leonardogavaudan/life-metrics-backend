@@ -23,6 +23,37 @@ set +a
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose unzip curl
 
+# -------------------------------------------------------------------------
+# Harden firewall (ufw) and install fail2ban
+# -------------------------------------------------------------------------
+
+# Ensure ufw is installed
+if ! command -v ufw >/dev/null; then
+  echo "Installing ufw..."
+  sudo apt-get install -y ufw
+fi
+
+echo "Configuring firewall rules"
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 3000/tcp  # API
+sudo ufw allow 5672/tcp  # RabbitMQ
+sudo ufw allow 15672/tcp # RabbitMQ management UI
+sudo ufw --force enable
+
+# Install and enable fail2ban
+if ! command -v fail2ban-client >/dev/null; then
+  echo "Installing fail2ban..."
+  sudo apt-get install -y fail2ban
+  sudo systemctl enable fail2ban
+  sudo systemctl start fail2ban
+else
+  echo "fail2ban already installed"
+fi
+
 function run_migrations {
   function install_goose {
     echo "Installing goose..."
